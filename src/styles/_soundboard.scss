@@ -1,0 +1,135 @@
+#mou-soundboard, #mou-soundboard-edit {
+  min-width: 60px !important;
+
+  .success {
+    color: green;
+  }
+
+  .error {
+    color: red;
+  }
+
+  .boardrow {
+    display: flex;
+    align-items: center;
+  }
+
+  .snd {
+    position: relative;
+    overflow: hidden;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    min-height: 36px;
+    max-width: 36px;
+    max-height: 36px;
+    box-sizing: content-box;
+    font-size: 24px;
+    line-height: 36px;
+    background: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 4px var(--color-shadow-dark);
+    margin: 0 0 8px 0;
+    color: var(--color-text-light-4);
+    text-align: center;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 5px;
+    cursor: pointer;
+    display: inline-block;
+    margin: 5px;
+
+    &.size2 {
+      min-width: 84px !important;
+      max-width: 84px !important;
+      width: 84px !important;
+    }
+  
+    &.size3 {
+      min-width: 132px !important;
+      max-width: 132px !important;
+      width: 132px !important;
+    }
+
+    .play-icon {
+      position: absolute;
+      top: 0;
+      left: 0;
+      color: var(--color-text-hyperlink);
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      background-color: var(--color-text-hyperlink);
+      opacity: 0.5;
+    }
+  }
+
+  .audioname {
+    color: #666;
+    margin-right: 3px;
+    border: 1px solid var(--color-border-light-tertiary);
+    border-radius: 5px;
+    padding: 3px;
+  }
+
+  .snd.used {
+    &:hover {
+      font-weight: bold;
+      font-size: large;
+      border: 1px solid red;
+      border-bottom: 1px solid #ff6400;
+      box-shadow: 0 0 4px #ff6400;
+    }
+  }
+
+  .snd.unused {
+    background: rgba(0, 0, 0, 0.1);
+    cursor: auto;
+  }
+
+  .gotoSounds {
+    color: var(--color-text-hyperlink);
+    text-decoration: underline;
+  }
+
+  p {
+    position: relative;
+
+    .delete {
+      position: absolute;
+      top: 0px;
+      right: 10px;
+      color: darkred;
+    }
+
+    .export {
+      position: absolute;
+      top: 0px;
+      right: 50px;
+    }
+
+    .import {
+      position: absolute;
+      top: 0px;
+      right: 30px;
+    }
+  }
+
+  .options {
+    display: flex;
+
+    .delete {
+      color: darkred;
+    }
+
+    i {
+      margin-left: 5px;
+    }  
+
+    i.spacer {
+      margin-left: auto;
+    }
+  }
+
+  .helpMsg {
+    display: none;
+  }  
+}
