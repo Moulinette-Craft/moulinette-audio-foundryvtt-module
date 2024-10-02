@@ -1,0 +1,185 @@
+#mou-soundpads {
+
+  .window-content {
+    background: none;
+  }
+
+  .tabs {
+    color: white;
+    border-bottom: 1px solid white;
+    padding-bottom: 3px;
+    background-size: 220px;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &.tabletopaudio {
+      background-image: url("img/tabletopaudio.png");
+    }
+  }
+
+  .tabs.michaelghelfi {
+    background-image: url("img/michaelghelfi.png");
+  }
+
+  .tileres:hover {
+    background: white;
+  }
+
+  .sidebar {
+    position: relative;
+    height: 100%;
+  }
+
+  nav, footer, .info, .sounds {
+    position: absolute;
+  }
+
+  nav {
+    height: 55px;
+    width: 100%;
+  }
+
+  nav a {
+    margin: 2px;
+  }
+
+  .info {
+    top: 58px;
+    font-style: italic;
+    color: #ccc;
+    font-size: 10px;
+    text-align: center;
+    width: 100%;
+  }
+
+  .search {
+    position: absolute;
+    top: 78px;
+    width: 100%;
+  }
+
+  .categories {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    margin: 0;
+  }
+
+  .categories .cat {
+    text-transform: capitalize;
+    padding: 0px 4px;
+  }
+
+  .categories .cat.selected {
+    color: var(--color-text-hyperlink);
+  }
+
+  input {
+    color: #ccc;
+    vertical-align: middle;
+    width: calc(100% - 30px);
+  }
+
+  .mtteHide {
+    color: red;
+  }
+
+  .toggleVisibility {
+    font-size: 16px;
+    color: white;
+    padding: 2px;
+    vertical-align: middle;
+  }
+
+  .volume {
+    font-size: 15px;
+  }
+
+  input#search::placeholder {
+    color: #aaa;
+  }
+
+  .sounds {
+    color: #ccc;
+    top: 110px;
+    bottom: 95px;
+    width: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+  }
+
+  .sound {
+    display: flex;
+    align-items: center;
+    padding: 2px 5px;
+  }
+
+  .sound.alt {
+    margin-left: 8px;
+  }
+
+  .sound .duration {
+    position: relative;
+    margin-left: auto;
+    font-size: smaller;
+    padding-right: 5px;
+  }
+
+  .sound:hover {
+    background-color: #ccc;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .sounds h2 {
+    font-size: 1.2em;
+    margin-top: 5px;
+    border-bottom: 0px;
+  }
+
+  .sounds .assets {
+    display: none;
+  }
+
+  .othersoundpads {
+    height: 45px;
+    bottom: 45px;
+    position: absolute;
+  }
+
+  .othersoundpads img {
+    border: 1px solid transparent;
+    height: 36px;
+    margin: 1px;
+  }
+
+  .othersoundpads img:hover {
+    border: 1px solid var(--color-border-highlight-alt);
+    box-shadow: 0 0 10px var(--color-shadow-highlight) inset;
+  }
+
+  footer {
+    font-size: 20px;
+    color: white;
+    height: 45px;
+    bottom: 0px;
+    width: 100%;
+    border-top: 1px solid white;
+    padding-top: 5px;
+    text-align: center;
+  }
+
+  .warning {
+    display: none;
+    color: #eee;
+    text-align: center;
+    font-style: italic;
+  }
+
+  .variations {
+    position: absolute;
+    left: 200px;
+    display: none;
+    background-color: red;
+  }
+}

@@ -10,7 +10,7 @@ export class MouSoundboardEdit extends Application {
   private slot: string
   private parent: MouSoundboard
   private html?: JQuery<HTMLElement>
-  currentlyPlaying: HTMLAudioElement | null
+  private currentlyPlaying: HTMLAudioElement | null
 
   constructor(data: AnyDict, slot: string, parent: MouSoundboard) {
     super()

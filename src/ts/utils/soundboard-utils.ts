@@ -2,7 +2,7 @@ import MouApplication from "../apps/application";
 import { FOUNDRYVTT_PLAYLIST_ENTRY, MODULE_ID } from "../constants";
 import { AnyDict } from "../types";
 
-export class SoundboardUtils {
+export class MouSoundboardUtils {
   
   /**
    * Play a given sound

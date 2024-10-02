@@ -2,7 +2,7 @@ import { AnyDict } from "../types.js"
 import MouApplication from "./application.js"
 import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS } from "../constants.js"
 import { MouSoundboardEdit } from "./soundboard-edit.js"
-import { SoundboardUtils } from "../utils/soundboard-utils.js"
+import { MouSoundboardUtils } from "../utils/soundboard-utils.js"
 import MouMediaUtils from "../utils/media-utils.js"
 
 export class MouSoundboard extends Application {
@@ -300,7 +300,7 @@ export class MouSoundboard extends Application {
     if(slot) {
       let settings = MouApplication.getUserSoundboard()
       if(Object.keys(settings).includes("audio-" + slot)) {
-        SoundboardUtils.playSound((game as Game).user?.name || "??", settings["audio-" + slot])
+        MouSoundboardUtils.playSound((game as Game).user?.name || "??", settings["audio-" + slot])
       } else {
         ui.notifications?.warn((game as Game).i18n.localize("MOUSND.slot_notassigned"));
       }

@@ -3,9 +3,10 @@
 import "../styles/style.scss";
 import MouApplication from "./apps/application";
 import { MouSoundboard } from "./apps/soundboard";
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS } from "./constants";
+import { MouSoundPads } from "./apps/soundpads";
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "./constants";
 import { AnyDict, MouModule } from "./types";
-import { SoundboardUtils } from "./utils/soundboard-utils";
+import { MouSoundboardUtils } from "./utils/soundboard-utils";
 
 let module: MouModule;
 
@@ -14,6 +15,7 @@ Hooks.once("init", () => {
 
   module = MouApplication.getModule()
   module.soundboard = new MouSoundboard();
+  module.soundpads = new MouSoundPads();
   module.debug = true;
   
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, {
@@ -25,7 +27,28 @@ Hooks.once("init", () => {
     type: Boolean
   });
 
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_HIDE_CONTROLS, {
+    name: (game as Game).i18n.localize("MOUSND.config_hide_ui"),
+    hint: (game as Game).i18n.localize("MOUSND.config_hide_ui_hint"),
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_NO_TTA_WARNING, {
+    name: (game as Game).i18n.localize("MOUSND.config_hide_tta_warning"),
+    hint: (game as Game).i18n.localize("MOUSND.config_hide_tta_warning_hint"),
+    scope: "world",
+    config: true,
+    default: false,
+    type: Boolean
+  });
+
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDBOARDS, { scope: "client", config: false, type: Object, default: {} as AnyDict });
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_VOLUME, { scope: "world", config: false, default: 1, type: Number });
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_HIDDEN_FILES, { scope: "world", config: false, type: Object, default: {} });
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, { scope: "world", config: false, type: String, default: null });
 });
 
 Hooks.once("ready", () => {
@@ -43,6 +66,14 @@ Hooks.once("ready", () => {
           button: true, 
           onClick: () => { module.soundboard.render(true) } 
         })
+
+      moulinette.tools.push({ 
+          name: "soundpads", 
+          icon: "fa-solid fa-keyboard", 
+          title: (game as Game).i18n.localize("MOUSND.soundpads"),
+          button: true, 
+          onClick: () => { module.soundpads.render(true) } 
+        })
     }
 
     (game as any).socket.on(`module.${MODULE_ID}`, async function(data: AnyDict) {
@@ -50,7 +81,7 @@ Hooks.once("ready", () => {
       if(data.type == "playSound") {
         if(!data.user || !data.audio) return;
         MouApplication.logInfo("MouSoundboards", `Playing sound ${data.audio.path} from ${data.user}`)
-        SoundboardUtils.playSound(data.user, data.audio)
+        MouSoundboardUtils.playSound(data.user, data.audio)
       }
     })
   }
@@ -73,5 +104,5 @@ Hooks.on("renderSidebarTab", async (app : any, html : JQuery<HTMLElement>) => {
 });
 
 Hooks.on("preUpdatePlaylist", (playlist : Playlist, updateData: any) => {
-  SoundboardUtils.updatePlayingSound(playlist, updateData)
+  MouSoundboardUtils.updatePlayingSound(playlist, updateData)
 });

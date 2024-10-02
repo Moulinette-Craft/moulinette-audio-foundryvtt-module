@@ -1,0 +1,40 @@
+<form autocomplete="off" onsubmit="event.preventDefault();">
+
+    <div class="sidebar">
+
+    <nav class="sheet-tabs tabs {{creator}}"></nav>
+
+    <div class="info">{{localize "mtte.clickToToggle"}}</div>
+
+    <div class="search">
+        <input id="search" type="text" placeholder="{{localize "mtte.filter"}}"></input>
+        <a class="toggleVisibility"><i class="fas fa-eye-slash"></i></a>
+    </div>
+
+    <div class="sounds">
+        {{#if noAsset}}<div class="warning error">{{{localize "mtte.noSoundPads"}}}</div>{{/if}}
+        
+        <div class="categories">
+          {{#each categories as |c|}}<a class="cat" data-id="{{c}}"><i class="fa-solid fa-filter fa-xs"></i> {{c}}</a></span>{{/each}}
+        </div>
+
+        {{#each assets as |a|}}{{{a}}}{{/each}}
+        <div class="warning">{{localize "mtte.noMatch"}}</div>
+    </div>
+
+    <div class="othersoundpads">
+      <a class="tabletopaudio"><img src="modules/{{ MODULE_ID }}/img/tabletopaudio-small.png" title="Tabletop Audio"/></a>
+      <a class="michaelghelfi"><img src="modules/{{ MODULE_ID }}/img/michaelghelfi-small.png" title="Michael Ghelfi Studios"/></a>
+    </div>
+
+    <footer>
+      <div class="volume">{{localize "PLAYLIST.SoundVolume"}}
+        <input class="sound-volume" type="range" title="{{localize "PLAYLIST.SoundVolume"}}" value="{{volume}}" min="0" max="1" step="0.05">
+      </div>
+      <!--<a class="action refresh-access" title="{{localize "mtte.refreshAccess"}}"><i class="fas fa-unlock-alt"></i> </a>-->
+    </footer>
+
+  </div>
+
+
+</form>
