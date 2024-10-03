@@ -81,7 +81,7 @@ Hooks.once("ready", () => {
       if(data.type == "playSound") {
         if(!data.user || !data.audio) return;
         MouApplication.logInfo("MouSoundboards", `Playing sound ${data.audio.path} from ${data.user}`)
-        MouSoundboardUtils.playSound(data.user, data.audio)
+        MouSoundboardUtils.playSound(data.audio, `${(game as Game).i18n.localize("MOUSND.soundboard_name")}: ${data.user}`)
       }
     })
   }
@@ -105,4 +105,17 @@ Hooks.on("renderSidebarTab", async (app : any, html : JQuery<HTMLElement>) => {
 
 Hooks.on("preUpdatePlaylist", (playlist : Playlist, updateData: any) => {
   MouSoundboardUtils.updatePlayingSound(playlist, updateData)
+});
+
+/**
+ * Manage canvas drop
+ */
+Hooks.on('dropCanvasData', (canvas, data) => {
+  canvas; // unused
+  if("moulinette" in data) {
+    // Drag & drop a sound
+    if(data.moulinette.sound) {
+      module.soundpads.createAmbientSound(data)
+    }
+  }
 });

@@ -7,7 +7,7 @@ export class MouSoundboardUtils {
   /**
    * Play a given sound
    */
-  static async playSound(fromUser: string, audio: AnyDict) {
+  static async playSound(audio: AnyDict, playlistName: string) {
     // if not GM, ask GM to play sound
     if (!(game as Game).user?.isGM) {
       (game as Game).socket?.emit(`module.${MODULE_ID}`, {
@@ -17,13 +17,15 @@ export class MouSoundboardUtils {
       });
       return
     }
-    const playlistName = `${(game as Game).i18n.localize("MOUSND.soundboard_name")}: ${fromUser}`
+    console.log("HERE")
     const volume = audio.volume ? Number(audio.volume) : 1.0
     // get playlist
     let playlist = (game as Game).playlists?.find( (pl : any) => pl.name == playlistName)
     if(!playlist) {
       const moulinette = MouApplication.getMoulinetteModule()
       const folder = moulinette ? await moulinette.utils?.foundry.getOrCreateFolder("Playlist", "Moulinette") : null
+      console.log(folder)
+      return;
       playlist = await Playlist.create({name: playlistName, mode: -1, folder: folder })
       if(!playlist) return;
     }

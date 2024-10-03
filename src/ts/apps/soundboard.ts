@@ -7,7 +7,7 @@ import MouMediaUtils from "../utils/media-utils.js"
 
 export class MouSoundboard extends Application {
 
-  static CELL_SIZE = 36 + 2 + 10 // border(1) & margin(5)
+  static CELL_SIZE = 36 + 2 + 10 // border(1x2) & margin(5x2)
 
   private cols: number = 10
   private rows: number = 1
@@ -256,7 +256,7 @@ export class MouSoundboard extends Application {
           settings[`audio-${toSlot}`] = { 
             name: name,
             path: [data.path],
-            volume: AudioHelper.inputToVolume(data.volume) 
+            volume: (foundry as AnyDict).audio.AudioHelper.inputToVolume(data.volume) 
           }
           await MouApplication.setUserSoundboard(settings)
           */
@@ -300,7 +300,9 @@ export class MouSoundboard extends Application {
     if(slot) {
       let settings = MouApplication.getUserSoundboard()
       if(Object.keys(settings).includes("audio-" + slot)) {
-        MouSoundboardUtils.playSound((game as Game).user?.name || "??", settings["audio-" + slot])
+        const playlistName = `${(game as Game).i18n.localize("MOUSND.soundboard_name")}: ${(game as Game).user?.name || "??"}`
+        const soundUri = settings["audio-" + slot]
+        MouSoundboardUtils.playSound(soundUri, playlistName)
       } else {
         ui.notifications?.warn((game as Game).i18n.localize("MOUSND.slot_notassigned"));
       }

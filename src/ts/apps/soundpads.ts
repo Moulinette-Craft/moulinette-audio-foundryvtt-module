@@ -1,4 +1,4 @@
-import { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "../constants"
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "../constants"
 import { AnyDict } from "../types"
 import MouMediaUtils from "../utils/media-utils"
 import { MouSoundpadUtils } from "../utils/soundpad-utils"
@@ -71,7 +71,7 @@ export class MouSoundPads extends MouApplication {
     } else {
       this.creator = "tabletopaudio"
     }
-    console.log("HERE")
+    
     const moulinette = MouApplication.getMoulinetteModule()
     if(!moulinette) {
       throw new Error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
@@ -228,24 +228,8 @@ export class MouSoundPads extends MouApplication {
     html.find(".sound:not(.alt)").on("mousedown", (ev) => this._onMouseDown(ev))
 
     // preview sound
-    html.find(".sound").on("hover", (event: Event) => {
-      parent.previewTimeout = setTimeout(function() {
-        const soundIdx = $(event.currentTarget as HTMLElement).data('idx')
-        if(soundIdx && soundIdx > 0 && soundIdx <= parent.sounds!.length) {
-          const soundData = parent.sounds![soundIdx-1]
-          const pack = parent.packs!.find((p : AnyDict) =>  p.idx == soundData.pack)
-          const start = soundData.duration && soundData.duration > 20 ? soundData.duration / 2 : 0
-          parent.previewSound.src = `${pack.path}/${soundData.filename}?${pack.sas}` + (start > 0 ? `#t=${start}` : "")
-          parent.previewSound.play();
-        }
-      }, 1000);
-    }, function() {
-      clearTimeout(parent.previewTimeout);
-      if(parent.previewSound) {
-        parent.previewSound.pause()
-        parent.previewSound.src = ""
-      }
-    });
+    html.find(".sound").on("mouseenter", (ev) => this._onPreviewSound(ev))
+    html.find(".sound").on("mouseleave", () => this._onStopPreviewSound())
 
     // put focus on search
     html.find("#search").trigger("focus");
@@ -260,8 +244,7 @@ export class MouSoundPads extends MouApplication {
       for(const creatorKey of Object.keys(MouSoundPads.CREATORS)) {
         if(link.classList.contains(creatorKey)) {  
           this.creator = creatorKey
-          MouApplication.setSettings(SETTINGS_SOUNDPAD_CREATOR, creatorKey)
-          this.render(true)
+          MouApplication.setSettings(SETTINGS_SOUNDPAD_CREATOR, creatorKey).then(() => { this.render(true) })
         }
       }
     })
@@ -310,7 +293,7 @@ export class MouSoundPads extends MouApplication {
   /**
    * Show or hide entries based on settings
    */
-  toggleVisibility() {
+  private toggleVisibility() {
     if(!this.packs || !this.sounds) return;
     const showAll = this.showAll
     // make all visible
@@ -358,7 +341,7 @@ export class MouSoundPads extends MouApplication {
     
   }
 
-  _onSoundVolume(event : JQuery.ChangeEvent) {
+  private _onSoundVolume(event : JQuery.ChangeEvent) {
     event.preventDefault();
     const slider = event.currentTarget as HTMLInputElement;
 
@@ -369,7 +352,15 @@ export class MouSoundPads extends MouApplication {
     }
   }
 
-  async _onMouseDown(event: JQuery.MouseDownEvent) {
+  /**
+   * Handles the mouse down (right click) event on soundpad elements.
+   * 
+   * @param event - The mouse down event triggered by the user.
+   * 
+   * The method ensures that the visibility state of soundpad elements is properly managed and persisted in the application settings.
+   */
+  private async _onMouseDown(event: JQuery.MouseDownEvent) {
+    // right click
     if(event.button == 2) {
       const source = event.currentTarget as HTMLElement
       if(!source) return
@@ -384,7 +375,8 @@ export class MouSoundPads extends MouApplication {
           }
           $(folder).toggleClass("mtteHide")
         }
-      } else {
+      } 
+      else {
         const idx = $(source).data('idx')
         if(idx && idx > 0 && idx <= this.sounds!.length) {
           key = this.sounds![idx-1].filename
@@ -430,7 +422,7 @@ export class MouSoundPads extends MouApplication {
   /**
    * Show/hide assets in one specific folder
    */
-  _onToggleExpand(event : Event) {
+  private _onToggleExpand(event : Event) {
     event.preventDefault();
     const source = event.currentTarget as HTMLElement
     if(!source) return
@@ -443,13 +435,10 @@ export class MouSoundPads extends MouApplication {
   /**
    * Show/hide assets in one specific folder
    */
-  _onAction(event : Event) {
+  private _onAction(event : Event) {
     event.preventDefault();
     const source = event.currentTarget as HTMLElement
     if(!source) return
-    if(source.classList.contains("refresh-access")) {
-      console.log("To be implemented!")
-    }
   }
 
 
@@ -464,25 +453,25 @@ export class MouSoundPads extends MouApplication {
     // sounds
     if(soundIdx && soundIdx > 0 && soundIdx <= this.sounds!.length) {
       const soundData = this.sounds![soundIdx-1]
-      const pack = duplicate(this.packs!.find((p : AnyDict) => p.idx == soundData.pack))
-      const sound = duplicate(soundData)
+      const pack = foundry.utils.duplicate(this.packs!.find((p : AnyDict) => p.idx == soundData.pack))
+      const sound = foundry.utils.duplicate(soundData)
       sound.sas = "?" + pack.sas
 
       const dragData = {
-        source: "mtte",
-        type: "Sound",
-        sound: sound,
-        pack: pack,
-        volume: MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME),
-        repeat: soundData.pack ? soundData.filename.toLowerCase().includes("loop") : true
+        moulinette: { 
+          sound: sound, 
+          pack: pack.packId,
+          volume: MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME),
+          repeat: soundData.pack ? soundData.filename.toLowerCase().includes("loop") : true  
+        },
+        type: "SoundpadSound",
       };
 
-      dragData.source = "mtte"
       event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
     }
   }
 
-  async _onPlaySound(event : Event) {
+  private async _onPlaySound(event : Event) {
     event.preventDefault();
     if(!event.currentTarget) return
     const soundIdx = $(event.currentTarget).data('idx')
@@ -497,22 +486,27 @@ export class MouSoundPads extends MouApplication {
       let url = soundData.pack ? `${pack.path}/${soundData.filename}` : soundData.filename
 
       // add to playlist
+      const moulinette = MouApplication.getMoulinetteModule()
+      const folder = moulinette ? await moulinette.utils?.foundry.getOrCreateFolder("Playlist", "Moulinette") : null
       const playlistName = MouSoundPads.MOULINETTE_PLAYLIST.replace("#CREATOR#", MouSoundPads.CREATORS[this.creator!])
       let playlist = (game as Game).playlists!.find( pl => pl.name == playlistName )
       if(!playlist) {
-        playlist = await Playlist.create({name: playlistName, mode: -1})
+        playlist = await Playlist.create({name: playlistName, mode: -1, folder: folder })
       }
 
       // download sound (unless user doesn't support TTA with appropriate tier)
       if(!userMayNotDownload) {
-        const data = {
-          pack: duplicate(pack),
-          sound: { filename: soundData.filename, sas: "?" + pack.sas }
+        if(moulinette) {
+          const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack.path)
+          const downloadResult = await moulinette.utils.filemanager.downloadFile(`${soundData.filename}?${pack.sas}`, pack.path, folderPath)
+          if(downloadResult) {
+            url = downloadResult.path
+          } else {
+            this.logError(`Failed to download sound ${soundData.filename}!`)
+          }
+        } else {
+          this.logError("Moulinette Media Search module not found! This should never happen.")
         }
-        console.log(data)
-
-        //await MoulinetteSoundsUtil.downloadAsset(data)
-        //url = data.path
       }
 
       let sound = playlist!.sounds.find( (s : AnyDict) => s.path.startsWith(url) ) as AnyDict
@@ -542,13 +536,11 @@ export class MouSoundPads extends MouApplication {
     }
   }
 
-  _onSearch(expandCollapse = true) {
+  private _onSearch(expandCollapse = true) {
     //event.preventDefault();
     const text = this.html!.find("#search").val()?.toString().toLowerCase()
     const searchTerms = text?.split(" ")
-    if(!text || !searchTerms || searchTerms.length == 0) return
     
-    const showAll = this.showAll
     const hidden = MouApplication.getSettings(SETTINGS_SOUNDPAD_HIDDEN_FILES) as AnyDict
     
     // build list of filtered entries
@@ -563,16 +555,18 @@ export class MouSoundPads extends MouApplication {
     // get list of all matching sounds
     const matches = this.sounds!.filter((s : AnyDict) => {
       // by default, hide all "hidden" entries
-      if(!showAll && filtered.includes(this.sounds![s.idx-1].filename)) {
+      if(!this.showAll && filtered.includes(this.sounds![s.idx-1].filename)) {
         return false;
       }
       // filter by category
       if(this.category && !(s.cat && s.cat.includes(this.category.toLowerCase()))) {
         return false;
       }
-      for( const f of searchTerms ) {
-        if( s.name.toLowerCase().indexOf(f) < 0 && (!s.tags || s.tags.toLowerCase().indexOf(f) < 0)) {
-          return false;
+      if(searchTerms && searchTerms.length > 0) {
+        for( const f of searchTerms ) {
+          if( s.name.toLowerCase().indexOf(f) < 0 && (!s.tags || s.tags.toLowerCase().indexOf(f) < 0)) {
+            return false;
+          }
         }
       }
       return true
@@ -598,7 +592,7 @@ export class MouSoundPads extends MouApplication {
       const sounds = this.folders![k].filter((s : AnyDict) => matchesIdx.includes(s.idx))
       const folder = this.html!.find(`[data-path='${k}']`)
       const folderHidden = folderFilterd.includes(k)
-      if(sounds.length == 0 || (!showAll && folderHidden)) {
+      if(sounds.length == 0 || (!this.showAll && folderHidden)) {
         folder.hide()
       } else {
         // replace the cound inside the ()
@@ -611,7 +605,7 @@ export class MouSoundPads extends MouApplication {
 
     // open/close all folders
     if(expandCollapse) {
-      if(text.length > 0) {
+      if(text && text.length > 0) {
         this.html?.find('.assets').show()
         this.html?.find(".folder h2 i").attr("class", "fas fa-folder-open")
       } else {
@@ -625,6 +619,72 @@ export class MouSoundPads extends MouApplication {
       this.html?.find('.warning').show();
     } else {
       this.html?.find('.warning').hide();
+    }
+  }
+
+  private _onPreviewSound(ev: JQuery.MouseEnterEvent): void {
+    const parent = this
+    this.previewTimeout = setTimeout(function() {
+      const soundIdx = $(ev.currentTarget as HTMLElement).data('idx')
+      if(soundIdx && soundIdx > 0 && soundIdx <= parent.sounds!.length) {
+        const soundData = parent.sounds![soundIdx-1]
+        const pack = parent.packs!.find((p : AnyDict) =>  p.idx == soundData.pack)
+        const start = soundData.duration && soundData.duration > 20 ? soundData.duration / 2 : 0
+        parent.previewSound.src = `${pack.path}/${soundData.filename}?${pack.sas}` + (start > 0 ? `#t=${start}` : "")
+        parent.previewSound.play();
+      }
+    }, 1000);
+  }
+
+  private _onStopPreviewSound(): void {
+    clearTimeout(this.previewTimeout);
+    if(this.previewSound) {
+      this.previewSound.pause()
+      this.previewSound.src = ""
+    }
+  }
+
+  /**
+   * Creates an ambient sound resulting from a drag & drop
+   */
+  async createAmbientSound(data: AnyDict): Promise<boolean> {
+    if(!canvas) return false;
+    if(MouSoundpadUtils.noTTADownload()) {
+      if(!MouApplication.getSettings(SETTINGS_SOUNDPAD_NO_TTA_WARNING)) {
+        ui.notifications?.warn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+      }
+      this.logWarn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+      return false;
+    }
+    else {
+      console.log(data)
+      const moulinette = MouApplication.getMoulinetteModule()
+      const pack = this.packs!.find((p : AnyDict) => p.packId == data.moulinette.pack)
+      console.log(pack)
+      if(moulinette && pack) {
+        const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack.path)
+        const downloadResult = await moulinette.utils.filemanager.downloadFile(`${data.moulinette.sound.filename}?${pack.sas}`, pack.path, folderPath)
+
+        // Validate that the drop position is in-bounds and snap to grid
+        if ( !canvas.dimensions!.rect.contains(data.x, data.y) ) return false;
+        
+        const soundData = {
+          t: "l",
+          x: data.x,
+          y: data.y,
+          path: downloadResult.path,
+          radius: MouConfig.AMBIENT_SOUND_RADIUS,
+          repeat: data.moulinette.repeat,
+          volume: data.moulinette.volume
+        }
+
+        console.log(data, soundData)
+        
+        await canvas.scene!.createEmbeddedDocuments("AmbientSound", [soundData]);
+        canvas.sounds!.activate();
+        return true
+      }
+      return false
     }
   }
 }

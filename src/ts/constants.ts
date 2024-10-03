@@ -13,9 +13,18 @@ export const SETTINGS_SOUNDPAD_NO_TTA_WARNING = "soundpad_no_tta_warning"
 export const FOUNDRYVTT_PLAYLIST_ENTRY = "PlaylistSound"
 
 /**
- * Some constants which are configurable on runtime
+ * The constants below can be overridden using the following macro :
+ * `game.modules.get("moulinette-soundboards").configs.[CONFIG_NAME] = [NEW_VALUE]`
+ * 
+ * Example:
+ * `game.modules.get("moulinette-soundboards").configs.MAX_ROWS = 10`
  */
 export default class MouConfig {
-  static MAX_ROWS = 30
-  static MAX_COLS = 30
+
+  /** Soundboards */
+  static MAX_ROWS = 30 // max number of allowed rows
+  static MAX_COLS = 30 // max number of allowed columns
+
+  /** Soundpads */
+  static AMBIENT_SOUND_RADIUS = 10 // default radius used for ambient sounds (drag & drop action)
 }
