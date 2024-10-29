@@ -62,7 +62,7 @@ export default class MouApplication extends Application {
   }
 
   static async setSettings(key: string, value: unknown) : Promise<unknown> {
-    MouApplication.logInfo(MouApplication.APP_NAME, `Storing data for settings ${key}`)
+    MouApplication.logDebug(MouApplication.APP_NAME, `Storing data for settings ${key}`)
     return (game as Game).settings.set(MODULE_ID, key, value)  
   }
 

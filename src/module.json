@@ -21,5 +21,7 @@
     }
   ],
   "styles": ["style.css"],
-  "esmodules": ["scripts/module.js"]
+  "esmodules": ["scripts/module.js"],
+  "manifest": "https://moulinette-demo.nyc3.digitaloceanspaces.com/moulinette-soundboards-module.json",
+  "download": "https://moulinette-demo.nyc3.digitaloceanspaces.com/moulinette-soundboards.zip"
 }

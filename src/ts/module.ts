@@ -61,7 +61,7 @@ Hooks.once("ready", () => {
     if(moulinette && moulinette.tools) {
       moulinette.tools.push({ 
           name: "soundboard", 
-          icon: "fa-solid fa-keyboard", 
+          icon: "mou-icon mou-soundboard", 
           title: (game as Game).i18n.localize("MOUSND.soundboard"),
           button: true, 
           onClick: () => { module.soundboard.render(true) } 
@@ -69,7 +69,7 @@ Hooks.once("ready", () => {
 
       moulinette.tools.push({ 
           name: "soundpads", 
-          icon: "fa-solid fa-keyboard", 
+          icon: "mou-icon mou-soundpad", 
           title: (game as Game).i18n.localize("MOUSND.soundpads"),
           button: true, 
           onClick: () => { module.soundpads.render(true) } 

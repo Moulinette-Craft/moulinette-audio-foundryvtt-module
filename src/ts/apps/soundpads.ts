@@ -71,7 +71,7 @@ export class MouSoundPads extends MouApplication {
     } else {
       this.creator = "tabletopaudio"
     }
-    
+    console.log("HERE")
     const moulinette = MouApplication.getMoulinetteModule()
     if(!moulinette) {
       throw new Error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
@@ -660,7 +660,6 @@ export class MouSoundPads extends MouApplication {
       console.log(data)
       const moulinette = MouApplication.getMoulinetteModule()
       const pack = this.packs!.find((p : AnyDict) => p.packId == data.moulinette.pack)
-      console.log(pack)
       if(moulinette && pack) {
         const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack.path)
         const downloadResult = await moulinette.utils.filemanager.downloadFile(`${data.moulinette.sound.filename}?${pack.sas}`, pack.path, folderPath)

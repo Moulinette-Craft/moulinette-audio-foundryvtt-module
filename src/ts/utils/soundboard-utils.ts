@@ -17,7 +17,6 @@ export class MouSoundboardUtils {
       });
       return
     }
-    console.log("HERE")
     const volume = audio.volume ? Number(audio.volume) : 1.0
     // get playlist
     let playlist = (game as Game).playlists?.find( (pl : any) => pl.name == playlistName)
