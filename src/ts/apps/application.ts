@@ -1,4 +1,4 @@
-import { MODULE_ID, MODULE_MOULINETE_ID, SETTINGS_SOUNDBOARDS } from "../constants";
+import { MODULE_ID, MODULE_MOULINETTE_ID, SETTINGS_SOUNDBOARDS } from "../constants";
 import { AnyDict, MouModule } from "../types";
 
 /**
@@ -58,7 +58,7 @@ export default class MouApplication extends Application {
   }
 
   static getMoulinetteModule(): any {
-    return (game as Game).modules.get(MODULE_MOULINETE_ID) as MouModule;
+    return (game as Game).modules.get(MODULE_MOULINETTE_ID) as MouModule;
   }
 
   static async setSettings(key: string, value: unknown) : Promise<unknown> {

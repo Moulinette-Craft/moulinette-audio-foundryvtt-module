@@ -19,8 +19,8 @@ export class MouSoundpadUtils {
     // sort all files back into their folders
     for(const f of files) {
       id++;
-      const idx = f.filename.lastIndexOf('/')
-      let parent = idx < 0 ? "" : f.filename.substring(0, idx)
+      const idx = f.filepath.lastIndexOf('/')
+      let parent = idx < 0 ? "" : f.filepath.substring(0, idx)
       if(lastFolderOnly) {
         parent = parent.split("/").pop()
       }
@@ -60,80 +60,31 @@ export class MouSoundpadUtils {
     /**
    * Reads a given URL (json) and builds an asset index
    */
-  static async getSoundpadSounds() : Promise<{ assets: AnyDict[], packs: AnyDict[] }> {
+  static async getSoundpadSounds(creator: string) : Promise<{ assets: AnyDict[], packs: AnyDict[] }> {
     let assets = [] as AnyDict[]
-    let assetsPacks = [] as AnyDict[]
     const moulinette = MouApplication.getMoulinetteModule()
-
-    if(MouSoundpadUtils.indexingInProgress || !moulinette) return { assets: assets, packs: assetsPacks }
-    MouSoundpadUtils.indexingInProgress = true
-    
-    //const progressbar = (new game.moulinette.applications.MoulinetteProgress(game.i18n.localize("mtte.indexingMoulinette")))
-    //progressbar.render(true)
-
-    // build tiles' index 
-    let idx = 0;
-    //progressbar.setProgress(Math.round((idx / urlList.length)*100))
-    
+      
     // try to load from cache when exists
     let data: AnyDict[]
-    if(moulinette.cache.soundpads) {
-      data = moulinette.cache.soundpads
+    if(moulinette.cache.soundpads && moulinette.cache.soundpads[creator]) {
+      data = moulinette.cache.soundpads[creator]
     } 
     else { 
-      data = await moulinette.cloudclient.apiGET("/soundpads/sounds", { session: moulinette.getSessionId() })
-      moulinette.cache.soundpads = data
-    }
-    
-    try {
-      for(const creator of data) {
-        for(const pack of creator.packs) {
-          // add pack
-          const packData = {
-            idx: idx,
-            packId: pack.id,
-            publisher: creator.publisher,
-            pubWebsite: creator.website,
-            name: pack.name,
-            url: pack.url,
-            license: pack.license,
-            licenseUrl: pack.licenseUrl,
-            path: pack.path,
-            count: pack.assets.length,
-            isLocal: pack.isLocal,
-            isFree: pack.free,
-            source: pack.source,
-            sas: pack.sas
-          }
-          for(let i = 0; i<pack.assets.length; i++) {
-            let asset = pack.assets[i]
-            // SAS for individual asset
-            const sas = Array.isArray(pack.sas) ? [pack.sas[2*i],pack.sas[2*i+1]] : null
-            if(asset.type == "snd") {
-              const aData = { 
-                pack: idx, 
-                filename: asset.path, 
-                type: asset.type, 
-                duration: asset.duration, 
-                loop: asset.loop, 
-                title: asset.title, 
-                cat: asset.cat, 
-                order: asset.order 
-              } as AnyDict
-              if(sas) { aData['sas'] = sas[0] }
-              assets.push(aData)
-            }
-          }
-          assetsPacks.push(packData)
-          idx++;
-        }
+      data = await moulinette.cloudclient.apiGET(`/soundpads/sounds/${creator}`, { session: moulinette.getSessionId() })
+      if(!moulinette.cache.soundpads) {
+        moulinette.cache.soundpads = {}
       }
-    } catch (e) {
-      console.log(`Moulinette FileUtil | Error building index of ${URL}`, e)
+      moulinette.cache.soundpads[creator] = data
     }
-    //progressbar.setProgress(100)
     
-    MouSoundpadUtils.indexingInProgress = false
-    return { assets: assets, packs: assetsPacks }
+    const assetsPacks = {} as AnyDict
+    for(const asset of data) {
+      if(!(asset.pack.pack_ref in assetsPacks)) {
+        assetsPacks[asset.pack.pack_ref] = asset.pack
+      }
+      assets.push(asset)
+    }
+    
+    return { assets: assets, packs: Object.values(assetsPacks) }
   }
 }

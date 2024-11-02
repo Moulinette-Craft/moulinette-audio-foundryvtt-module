@@ -1,4 +1,4 @@
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "../constants"
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME, MOU_STORAGE } from "../constants"
 import { AnyDict } from "../types"
 import MouMediaUtils from "../utils/media-utils"
 import { MouSoundpadUtils } from "../utils/soundpad-utils"
@@ -54,7 +54,7 @@ export class MouSoundPads extends MouApplication {
   }
 
   static cleanSoundName(filename: string) {
-    let soundName = filename.replaceAll(".ogg", "").replaceAll("loop", "").replaceAll("_", " ").replaceAll("-", " ").replace("/", " / ")
+    let soundName = filename.replaceAll(".ogg", "").replaceAll(".mp3", "").replaceAll("loop", "").replaceAll("_", " ").replaceAll("-", " ").replace("/", " / ")
 
     // uppercase first letter of each word
     soundName = soundName.split(" ").map((word) => {
@@ -71,25 +71,24 @@ export class MouSoundPads extends MouApplication {
     } else {
       this.creator = "tabletopaudio"
     }
-    console.log("HERE")
+    
     const moulinette = MouApplication.getMoulinetteModule()
     if(!moulinette) {
       throw new Error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
     }
     
-    const index = await MouSoundpadUtils.getSoundpadSounds()
+    const index = await MouSoundpadUtils.getSoundpadSounds(MouSoundPads.CREATORS[this.creator])
     const categories = [] as AnyDict[]
     let sounds = []
 
+    const soundpadPacks = index.packs.filter((p : AnyDict) => p.creator_ref == this.creator!)
 
-    const soundpadPacks = index.packs.filter((p : AnyDict) => p.publisher == MouSoundPads.CREATORS[this.creator!])
-    const packIds = soundpadPacks.map((p : AnyDict) => p.idx)
-    sounds = index.assets.filter((s : AnyDict) => packIds.includes(s.pack))
+    sounds = index.assets
     for(const s of sounds) {
-      s.name = s.title ? s.title : MouSoundPads.cleanSoundName(s.filename.split("/").pop())
-      if(s.cat) {
+      s.name = s.audio?.title ? s.audio?.title : MouSoundPads.cleanSoundName(s.filepath.split("/").pop())
+      if(s.audio?.categ) {
         const categs = []
-        for(const c of s.cat) {
+        for(const c of s.audio.categ) {
           const categ = c.toLowerCase()
           categs.push(categ)
           if(!categories.includes(categ)) {
@@ -109,11 +108,11 @@ export class MouSoundPads extends MouApplication {
     if("/" in this.folders) {
       for(const snd of this.folders["/"]) {
         // find match based on prefix
-        const idx = snd.filename.indexOf("_")
+        const idx = snd.filepath.indexOf("_")
         if(idx <= 0) continue
-        const prefix = snd.filename.substring(0, idx)
+        const prefix = snd.filepath.substring(0, idx)
         Object.keys(this.folders).forEach(key => {
-          const match = this.folders![key].find((s : AnyDict) => s.filename.indexOf(`/${prefix}_`) >= 0)
+          const match = this.folders![key].find((s : AnyDict) => s.filepath.indexOf(`/${prefix}_`) >= 0)
           if(match) {
             if(!match.alt) {
               match.alt = [snd]
@@ -167,10 +166,10 @@ export class MouSoundPads extends MouApplication {
    * Generates HTML for 1 single sound
    */
   static generateSoundHTML(a : AnyDict, tagsHTML : string, categHTML : string, variants : number) {
-    return `<div class="sound ${ variants > 0 ? "expandable" : "draggable" }" data-idx="${a.idx}"><i class="fas fa-music"></i>&nbsp;` +
-      `<span class="audio" ${tagsHTML} ${categHTML}>${a.name}${a.filename.toLowerCase().includes("loop") ? ' <i class="fas fa-sync fa-xs"></i>' : "" }` +
+    return `<div class="sound ${ variants > 0 ? "expandable" : "draggable" }" data-idx="${a.idx}" title="${a.filepath}"><i class="fas fa-music"></i>&nbsp;` +
+      `<span class="audio" ${tagsHTML} ${categHTML}>${a.name}${a.filepath.toLowerCase().includes("loop") ? ' <i class="fas fa-sync fa-xs"></i>' : "" }` +
       (variants > 0 ? ` (${variants}) <i class="exp fa-solid fa-angles-down"></i>` : "") +
-      `</span><span class="duration">${MouMediaUtils.prettyDuration(a.duration)}</span> </div>`
+      `</span><span class="duration">${MouMediaUtils.prettyDuration(a.audio.duration)}</span> </div>`
   }
 
   /**
@@ -180,9 +179,9 @@ export class MouSoundPads extends MouApplication {
     const regex = /\(([^\)]+)\)/g; // extract text in parenthesis
     const result = regex.exec(alt.name);
     const name = result ? result[1] : alt.name
-    return `<div class="sound draggable alt" data-parent="${orig.idx}" data-idx="${alt.idx}"><i class="fa-solid fa-compact-disc"></i>&nbsp;` +
-      `<span class="audio">${name}${alt.filename.toLowerCase().includes("loop") ? ' <i class="fas fa-sync"></i>' : "" }` +
-      `</span><span class="duration">${MouMediaUtils.prettyDuration(alt.duration)}</span> </div>`
+    return `<div class="sound draggable alt" data-parent="${orig.idx}" data-idx="${alt.idx}" title="${alt.filepath}"><i class="fa-solid fa-compact-disc"></i>&nbsp;` +
+      `<span class="audio">${name}${alt.filepath.toLowerCase().includes("loop") ? ' <i class="fas fa-sync"></i>' : "" }` +
+      `</span><span class="duration">${MouMediaUtils.prettyDuration(alt.audio.duration)}</span> </div>`
   }
 
 
@@ -265,7 +264,7 @@ export class MouSoundPads extends MouApplication {
     // patreon authentication
     html.find(".mouAuthenticate").on("click", ev => { 
       ev.preventDefault();
-      MouApplication.getMoulinetteModule().render(true);
+      MouApplication.getMoulinetteModule().user.render(true)
       return false; 
     })
 
@@ -302,7 +301,7 @@ export class MouSoundPads extends MouApplication {
     this.html?.find(".sound").removeClass("mtteHide")
     // show/hide
     const hidden = MouApplication.getSettings(SETTINGS_SOUNDPAD_HIDDEN_FILES) as AnyDict
-    const packIds = this.packs.map((p : AnyDict) => p.packId.toString())
+    const packIds = this.packs.map((p : AnyDict) => p.pack_ref.toString())
     
     // toggle visibility (files)
     for(const packId of packIds) {
@@ -394,7 +393,7 @@ export class MouSoundPads extends MouApplication {
       const hidden = MouApplication.getSettings(SETTINGS_SOUNDPAD_HIDDEN_FILES) as AnyDict
 
       // hide 1 single element (pack not null) or entire folder (pack null)
-      const packId = pack ? pack.packId.toString() : "folders"
+      const packId = pack ? pack.pack_ref.toString() : "folders"
       if(!(packId in hidden)) {
         hidden[packId] = []
       }
@@ -453,19 +452,20 @@ export class MouSoundPads extends MouApplication {
     // sounds
     if(soundIdx && soundIdx > 0 && soundIdx <= this.sounds!.length) {
       const soundData = this.sounds![soundIdx-1]
-      const pack = foundry.utils.duplicate(this.packs!.find((p : AnyDict) => p.idx == soundData.pack))
+      const pack = foundry.utils.duplicate(this.packs!.find((p : AnyDict) => p.pack_ref == soundData.pack.pack_ref))
       const sound = foundry.utils.duplicate(soundData)
       sound.sas = "?" + pack.sas
 
       const dragData = {
         moulinette: { 
           sound: sound, 
-          pack: pack.packId,
+          pack: pack.pack_ref,
           volume: MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME),
-          repeat: soundData.pack ? soundData.filename.toLowerCase().includes("loop") : true  
+          repeat: soundData.pack ? soundData.filepath.toLowerCase().includes("loop") : true  
         },
         type: "SoundpadSound",
       };
+
 
       event.dataTransfer?.setData("text/plain", JSON.stringify(dragData));
     }
@@ -481,10 +481,10 @@ export class MouSoundPads extends MouApplication {
 
     // sounds
     if(soundIdx && soundIdx > 0 && soundIdx <= this.sounds!.length) {
-      const soundData = this.sounds![soundIdx-1]
-      const pack = this.packs!.find((p : AnyDict) =>  p.idx == soundData.pack)
-      let url = soundData.pack ? `${pack.path}/${soundData.filename}` : soundData.filename
-
+      const asset = this.sounds![soundIdx-1]
+      const pack_path = `${MOU_STORAGE}${asset.pack.creator_ref}/${asset.pack.path}`
+      let url = `${pack_path}/${asset.uri}`
+      
       // add to playlist
       const moulinette = MouApplication.getMoulinetteModule()
       const folder = moulinette ? await moulinette.utils?.foundry.getOrCreateFolder("Playlist", "Moulinette") : null
@@ -497,26 +497,26 @@ export class MouSoundPads extends MouApplication {
       // download sound (unless user doesn't support TTA with appropriate tier)
       if(!userMayNotDownload) {
         if(moulinette) {
-          const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack.path)
-          const downloadResult = await moulinette.utils.filemanager.downloadFile(`${soundData.filename}?${pack.sas}`, pack.path, folderPath)
+          const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack_path)
+          const downloadResult = await moulinette.utils.filemanager.downloadFile(asset.uri, pack_path, folderPath)
           if(downloadResult) {
             url = downloadResult.path
           } else {
-            this.logError(`Failed to download sound ${soundData.filename}!`)
+            this.logError(`Failed to download sound ${asset.filepath}!`)
           }
         } else {
           this.logError("Moulinette Media Search module not found! This should never happen.")
         }
       }
 
-      let sound = playlist!.sounds.find( (s : AnyDict) => s.path.startsWith(url) ) as AnyDict
+      let sound = playlist!.sounds.find( (s : AnyDict) => s.path.startsWith(url.split("?")[0]) ) as AnyDict
       // create sound if doesn't exist
       if(!sound) {
         sound = {}
-        sound.name = MouSoundPads.cleanSoundName(soundData.filename.replaceAll("/", " | "))
+        sound.name = MouSoundPads.cleanSoundName(asset.filepath.replaceAll("/", " | "))
         sound.volume = 1
-        sound.repeat = soundData.pack ? soundData.filename.toLowerCase().includes("loop") : true
-        sound.path = url + (userMayNotDownload ? "?" + pack.sas : "")
+        sound.repeat = asset.filepath.toLowerCase().includes("loop")
+        sound.path = url
         sound = (await playlist!.createEmbeddedDocuments("PlaylistSound", [sound], {}))[0]
       }
 
@@ -547,8 +547,8 @@ export class MouSoundPads extends MouApplication {
     let filtered = [] as AnyDict[]
     const folderFilterd = "folders" in hidden ? hidden["folders"] : []
     this.packs!.forEach( (p : AnyDict) => { 
-      if (p.packId.toString() in hidden) { 
-        filtered = filtered.concat(hidden[p.packId.toString()]) 
+      if (p.pack_ref.toString() in hidden) { 
+        filtered = filtered.concat(hidden[p.pack_ref.toString()]) 
       } 
     })
 
@@ -627,10 +627,9 @@ export class MouSoundPads extends MouApplication {
     this.previewTimeout = setTimeout(function() {
       const soundIdx = $(ev.currentTarget as HTMLElement).data('idx')
       if(soundIdx && soundIdx > 0 && soundIdx <= parent.sounds!.length) {
-        const soundData = parent.sounds![soundIdx-1]
-        const pack = parent.packs!.find((p : AnyDict) =>  p.idx == soundData.pack)
-        const start = soundData.duration && soundData.duration > 20 ? soundData.duration / 2 : 0
-        parent.previewSound.src = `${pack.path}/${soundData.filename}?${pack.sas}` + (start > 0 ? `#t=${start}` : "")
+        const asset = parent.sounds![soundIdx-1]
+        const start = asset.audio.duration && asset.audio.duration > 20 ? asset.audio.duration / 2 : 0
+        parent.previewSound.src = `${MOU_STORAGE}${asset.pack.creator_ref}/${asset.pack.path}/${asset.uri}` + (start > 0 ? `#t=${start}` : "")
         parent.previewSound.play();
       }
     }, 1000);
@@ -657,13 +656,14 @@ export class MouSoundPads extends MouApplication {
       return false;
     }
     else {
-      console.log(data)
+      const asset = data.moulinette.sound
       const moulinette = MouApplication.getMoulinetteModule()
-      const pack = this.packs!.find((p : AnyDict) => p.packId == data.moulinette.pack)
+      const pack = this.packs!.find((p : AnyDict) => p.pack_ref == data.moulinette.pack)
+      const pack_path = `${MOU_STORAGE}${asset.pack.creator_ref}/${asset.pack.path}`
       if(moulinette && pack) {
-        const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack.path)
-        const downloadResult = await moulinette.utils.filemanager.downloadFile(`${data.moulinette.sound.filename}?${pack.sas}`, pack.path, folderPath)
-
+        const folderPath = moulinette.cloudclient.getDefaultDownloadFolder(pack_path)
+        const downloadResult = await moulinette.utils.filemanager.downloadFile(asset.uri, pack_path, folderPath)
+        
         // Validate that the drop position is in-bounds and snap to grid
         if ( !canvas.dimensions!.rect.contains(data.x, data.y) ) return false;
         
@@ -676,8 +676,6 @@ export class MouSoundPads extends MouApplication {
           repeat: data.moulinette.repeat,
           volume: data.moulinette.volume
         }
-
-        console.log(data, soundData)
         
         await canvas.scene!.createEmbeddedDocuments("AmbientSound", [soundData]);
         canvas.sounds!.activate();

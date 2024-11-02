@@ -12,7 +12,7 @@
     </div>
 
     <div class="sounds">
-        {{#if noAsset}}<div class="warning error">{{{localize "MOUSND.auth_required"}}}</div>{{/if}}
+        {{#if noAsset}}<div class="error">{{{localize "MOUSND.auth_required"}}}</div>{{/if}}
         
         <div class="categories">
           {{#each categories as |c|}}<a class="cat" data-id="{{c}}"><i class="fa-solid fa-filter fa-xs"></i> {{c}}</a></span>{{/each}}
