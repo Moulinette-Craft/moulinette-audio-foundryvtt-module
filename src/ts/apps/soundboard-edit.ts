@@ -69,21 +69,32 @@ export class MouSoundboardEdit extends Application {
     else if(button.classList.contains("browseSound")) {
       new FilePicker({callback: this._onAudioChosen.bind(this), type: "audio"}).render(true);
     }
-    else if(button.classList.contains("browseGameIcon")) {
-      //const icon = this.html.find("input.icon2").val()
-      /*
-      const picker = game.moulinette.applications.MoulinetteGameIconsPicker
-      if(!picker) {
-        return ui.notifications.error(game.i18n.localize("mtte.errorGameIconModule"));
+    else if(button.classList.contains("searchMoulinetteImage")) {
+      const moulinette = MouApplication.getMoulinetteModule()
+      if(moulinette && moulinette.active) {
+        const browser = new (moulinette.utils.browser)({}, "Image", this._onPathChosen.bind(this))
+        browser.render(true)
+      } else {
+        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
       }
-      if(!game.permissions.FILES_UPLOAD.includes(game.user.role)) {
-        return ui.notifications.error(game.i18n.localize("mtte.filepickerCanNotUpload"));
+    }
+    else if(button.classList.contains("searchMoulinetteIcon")) {
+      const moulinette = MouApplication.getMoulinetteModule()
+      if(moulinette && moulinette.active) {
+        const browser = new (moulinette.utils.browser)({}, "Icon", this._onIconChosen.bind(this))
+        browser.render(true)
+      } else {
+        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
       }
-
-      picker.browse("", (path) => {
-        this._onPathChosen(path)
-      })
-      */
+    }
+    else if(button.classList.contains("searchMoulinetteSound")) {
+      const moulinette = MouApplication.getMoulinetteModule()
+      if(moulinette && moulinette.active) {
+        const browser = new (moulinette.utils.browser)({}, "Audio", this._onAudioChosen.bind(this))
+        browser.render(true)
+      } else {
+        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
+      }
     }
     else if(button.classList.contains("delete")) {
       // prompt confirmation
@@ -133,6 +144,14 @@ export class MouSoundboardEdit extends Application {
     this.html?.find(".icon").val("")
     this.data.icon = path
     this.data.faIcon = false
+    this._updateAudioButtonLayout()
+  }
+
+  _onIconChosen(iconStr: string) {
+    this.html?.find("input.icon").val(iconStr)
+    this.html?.find(".icon2").val("")
+    this.data.icon = iconStr
+    this.data.faIcon = true
     this._updateAudioButtonLayout()
   }
 
@@ -220,25 +239,6 @@ export class MouSoundboardEdit extends Application {
   override activateListeners(html: JQuery<HTMLElement>) {
     const parent = this
     this.html = html
-
-    /*
-    IconPicker.Init({
-      // Required: You have to set the path of IconPicker JSON file to "jsonUrl" option. e.g. '/content/plugins/IconPicker/dist/iconpicker-1.5.0.json'
-      jsonUrl: "/modules/moulinette-core/iconpicker/iconpicker.json",
-      // Optional: Change the buttons or search placeholder text according to the language.
-      searchPlaceholder: (game as Game).i18n.localize("mtte.searchIcon"),
-      showAllButton: (game as Game).i18n.localize("mtte.showAll"),
-      cancelButton: (game as Game).i18n.localize("mtte.cancel"),
-      noResultsFound: (game as Game).i18n.localize("mtte.noResultsFound"),
-      // v1.5.0 and the next versions borderRadius: '20px', // v1.5.0 and the next versions
-    });
-    IconPicker.Run('#GetIconPickerEdit', function() {
-      html.find(".icon2").val("")
-      parent.data.icon = parent.html.find("input.icon").val()
-      parent.data.faIcon = parent.data.icon.length > 0
-      parent._updateAudioButtonLayout()
-    });
-    */
 
     html.find("button").on("click", this._onClick.bind(this))
     html.find(".snd").on("click", this._onTogglePreview.bind(this))

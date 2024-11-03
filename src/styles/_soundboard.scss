@@ -132,4 +132,14 @@
   .helpMsg {
     display: none;
   }  
+
+  .form-fields button {
+    max-width: 32px;
+  }
+
+  .actions {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+  }
 }

@@ -23,8 +23,6 @@ export class MouSoundboardUtils {
     if(!playlist) {
       const moulinette = MouApplication.getMoulinetteModule()
       const folder = moulinette ? await moulinette.utils?.foundry.getOrCreateFolder("Playlist", "Moulinette") : null
-      console.log(folder)
-      return;
       playlist = await Playlist.create({name: playlistName, mode: -1, folder: folder })
       if(!playlist) return;
     }
