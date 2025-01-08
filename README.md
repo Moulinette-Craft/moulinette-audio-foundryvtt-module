@@ -6,7 +6,7 @@
 ![Tested on fvtt-vtt.com](https://img.shields.io/badge/Forge-supported-success)
 [![Support me on Patreon](https://img.shields.io/badge/patreon-Support%20me-informational)](https://www.patreon.com/moulinette)
 
-This module is part of the [Moulinette suite](https://www.moulinette.cloud) of tools designed to simplify the search and use of content for game masters, helping them prepare their game sessions and even manage their games in real time. The module is designed for [FoundryVTT](https://foundryvtt.com/). A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators Tabletop Audio and Michael Ghelfi Studios (requires supporting them).
+This module is part of the [Moulinette suite](https://www.moulinette.cloud) of tools designed to simplify the search and use of [TTRPG](https://en.wikipedia.org/wiki/Tabletop_role-playing_game) content for game masters, helping them prepare their game sessions and even manage their games in real time. The module is designed for [FoundryVTT](https://foundryvtt.com/). A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators Tabletop Audio and Michael Ghelfi Studios (requires supporting them).
 
 #### Features
 
