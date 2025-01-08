@@ -5,12 +5,7 @@ import { defineConfig, Plugin } from "vite";
 
 const moduleVersion = process.env.MODULE_VERSION;
 const githubProject = process.env.GH_PROJECT;
-const githubTag = process.env.GH_TAG;
-
-console.log(moduleVersion)
-console.log(githubProject)
-console.log(githubTag)
-console.log(process.env)
+const githubTag = process.env.GITHUB_REF_NAME;
 
 export default defineConfig({
   build: {
