@@ -3,7 +3,7 @@
   "id": "moulinette-soundboards",
   "title": "Soundboard & Soundpad (by Moulinette)",
   "description": "A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators like Tabletop Audio and Michael Ghelfi Studios (requires supporting them).",
-  "version": "1.0.0",
+  "version": "VERSION",
   "packs": [],
   "relationships": {},
   "scripts": [],
@@ -22,6 +22,6 @@
   ],
   "styles": ["style.css"],
   "esmodules": ["scripts/module.js"],
-  "manifest": "https://raw.githubusercontent.com/SvenWerlen/moulinette-audio-foundryvtt-module/refs/heads/main/src/module.json",
-  "download": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/download/v-1.0.0/moulinette-soundboards.zip"
+  "manifest": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/latest/download/moulinette-soundboards.json",
+  "download": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/latest/download/moulinette-soundboards.zip"
 }
