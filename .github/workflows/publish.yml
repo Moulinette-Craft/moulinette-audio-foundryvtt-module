@@ -33,7 +33,7 @@ jobs:
 
       - name: Create zip archive
         working-directory: dist
-        run: zip -r ./moulinette-soundboards.zip module.json style.css scripts/ templates/ languages/ img/
+        run: zip -r ./module.zip module.json style.css scripts/ templates/ languages/ img/
 
       - name: Update release with files
         id: create_version_release
@@ -44,6 +44,6 @@ jobs:
           draft: ${{ github.event.release.unpublished }}
           prerelease: ${{ github.event.release.prerelease }}
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "./dist/moulinette-soundboards.json, ./dist/moulinette-soundboards.zip"
+          artifacts: "./dist/module.json, ./dist/module.zip"
           tag: ${{ github.event.release.tag_name }}
           body: ${{ github.event.release.body }}

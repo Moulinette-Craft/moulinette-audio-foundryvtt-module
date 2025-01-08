@@ -3,7 +3,6 @@ import copy from "rollup-plugin-copy";
 import scss from "rollup-plugin-scss";
 import { defineConfig, Plugin } from "vite";
 
-const moduleId = process.env.npm_package_name
 const moduleVersion = process.env.MODULE_VERSION;
 const githubProject = process.env.GH_PROJECT;
 const githubTag = process.env.GH_TAG;
@@ -55,11 +54,11 @@ function updateModuleManifestPlugin(): Plugin {
       manifestJson["version"] = version;
       if (githubProject) {
         const baseUrl = `https://github.com/${githubProject}/releases`;
-        manifestJson["manifest"] = `${baseUrl}/latest/download/${moduleId}.json`;
+        manifestJson["manifest"] = `${baseUrl}/latest/download/module.json`;
         if (githubTag) {
           manifestJson[
             "download"
-          ] = `${baseUrl}/download/${githubTag}/${moduleId}.zip`;
+          ] = `${baseUrl}/download/${githubTag}/module.zip`;
         }
       }
       await fsPromises.writeFile(
