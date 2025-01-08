@@ -2,8 +2,6 @@ import * as fsPromises from "fs/promises";
 import copy from "rollup-plugin-copy";
 import scss from "rollup-plugin-scss";
 import { defineConfig, normalizePath, Plugin } from "vite";
-import * as path from 'path'
-import * as url from 'url'
 
 const moduleVersion = process.env.MODULE_VERSION;
 const githubProject = process.env.GH_PROJECT;
@@ -22,23 +20,6 @@ export default defineConfig({
       },
     },
   },
-  /**
-  server: {
-    watch: {
-      ignored: (p) => {
-        console.log("HERE")
-        const relativePath = path.relative(
-          path.resolve(url.fileURLToPath(import.meta.url), 'src'),
-          p
-        )
-        return (
-          relativePath !== '' &&
-          relativePath !== 'src' &&
-          !normalizePath(relativePath).startsWith('src/')
-        )
-      }
-    }
-  }, */
   plugins: [
     updateModuleManifestPlugin(),
     scss({
