@@ -1,7 +1,7 @@
 {
-  "name": "moulinette-audio",
+  "name": "moulinette-soundboards",
   "version": "1.0.0",
-  "description": "Moulinette ",
+  "description": "A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators like Tabletop Audio and Michael Ghelfi Studios (requires supporting them).",
   "license": "MIT",
   "private": true,
   "scripts": {
