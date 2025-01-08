@@ -21,8 +21,11 @@ export default class MouMediaUtils {
    * ALWAYS COPY IT FROM moulinette-foundryvtt-module
    */
   static encodeURL(url: string) {
-    if(url.startsWith("https")) return url
-    return url.split('/').map(encodeURIComponent).join('/')
+    if(url.startsWith("https")) {
+      return "https://" + url.substring(8).split('/').map((el) => encodeURIComponent(el)).join('/')
+    } else {
+      return url.split('/').map(encodeURIComponent).join('/')
+    }
   }
 
   /**

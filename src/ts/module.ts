@@ -112,7 +112,6 @@ Hooks.on("preUpdatePlaylist", (playlist : Playlist, updateData: any) => {
  */
 Hooks.on('dropCanvasData', (canvas, data) => {
   canvas; // unused
-  console.log("dropCanvasData", data)
   if("moulinette" in data) {
     // Drag & drop a sound
     if(data.moulinette.sound) {
