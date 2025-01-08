@@ -7,6 +7,11 @@ const moduleVersion = process.env.MODULE_VERSION;
 const githubProject = process.env.GH_PROJECT;
 const githubTag = process.env.GH_TAG;
 
+console.log(moduleVersion)
+console.log(githubProject)
+console.log(githubTag)
+console.log(process.env)
+
 export default defineConfig({
   build: {
     sourcemap: true,
