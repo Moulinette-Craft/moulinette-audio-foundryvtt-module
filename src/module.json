@@ -23,5 +23,5 @@
   "styles": ["style.css"],
   "esmodules": ["scripts/module.js"],
   "manifest": "https://raw.githubusercontent.com/SvenWerlen/moulinette-audio-foundryvtt-module/refs/heads/main/src/module.json",
-  "download": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/download/v-1.1.2/moulinette-soundboards.zip"
+  "download": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/download/v-1.0.0/moulinette-soundboards.zip"
 }
