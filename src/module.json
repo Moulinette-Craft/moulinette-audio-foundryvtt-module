@@ -22,6 +22,7 @@
   ],
   "styles": ["style.css"],
   "esmodules": ["scripts/module.js"],
+  "url": "https://www.moulinette.cloud",
   "manifest": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/latest/download/module.json",
   "download": "https://github.com/SvenWerlen/moulinette-audio-foundryvtt-module/releases/latest/download/module.zip"
 }
