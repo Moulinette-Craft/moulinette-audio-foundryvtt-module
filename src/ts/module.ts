@@ -4,7 +4,7 @@ import "../styles/style.scss";
 import MouApplication from "./apps/application";
 import { MouSoundboard } from "./apps/soundboard";
 import { MouSoundPads } from "./apps/soundpads";
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "./constants";
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS, SETTINGS_SOUNDPAD_CHANNEL, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME } from "./constants";
 import { AnyDict, MouModule } from "./types";
 import { MouSoundboardUtils } from "./utils/soundboard-utils";
 
@@ -47,6 +47,7 @@ Hooks.once("init", () => {
 
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDBOARDS, { scope: "client", config: false, type: Object, default: {} as AnyDict });
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_VOLUME, { scope: "world", config: false, default: 1, type: Number });
+  (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_CHANNEL, { scope: "world", config: false, default: "environment", type: String });
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_HIDDEN_FILES, { scope: "world", config: false, type: Object, default: {} });
   (game as Game).settings.register(MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, { scope: "world", config: false, type: String, default: null });
 });

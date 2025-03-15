@@ -10,6 +10,7 @@
   "MOUSND.cancel": "Cancel",
   "MOUSND.cannot_browse": "You cannot use the FilePicker. Please ask your GM for permission!",
   "MOUSND.cannot_upload": "You cannot upload files to the Foundry VTT server. Please ask your GM for permission!",
+  "MOUSND.channel": "Channel",
   "MOUSND.click_to_toggle": "Right-click to hide/show a sound",
   "MOUSND.config_hide_tta_warning": "Hide TTA Warning",
   "MOUSND.config_hide_tta_warning_hint": "A warning is displayed every time a sound is played from Tabletop Audio while you are supporting TTA at the $3/month tier. You can disable this warning with this configuration. The warning will still be visible in the console logs.",
@@ -56,5 +57,6 @@
   "MOUSND.soundpads": "SoundPads & SoundBoards",
   "MOUSND.sounds": "Sounds",
   "MOUSND.tta_warning_nodownload": "By supporting Tabletop Audio (TTA) at the $3 per month tier, sounds are NOT downloaded and the URL will expire after 24 hours. Always play them from this UI. To build playlists or use sounds in scenes, support TTA at a higher tier. You can disable this warning in the configuration.",
+  "MOUSND.volume": "Volume",
   "ZMOU": ""
 }

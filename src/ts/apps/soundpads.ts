@@ -1,4 +1,4 @@
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME, MOU_STORAGE } from "../constants"
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDPAD_CREATOR, SETTINGS_SOUNDPAD_HIDDEN_FILES, SETTINGS_SOUNDPAD_HIDE_CONTROLS, SETTINGS_SOUNDPAD_NO_TTA_WARNING, SETTINGS_SOUNDPAD_VOLUME, MOU_STORAGE, SETTINGS_SOUNDPAD_CHANNEL } from "../constants"
 import { AnyDict } from "../types"
 import MouMediaUtils from "../utils/media-utils"
 import { MouSoundpadUtils } from "../utils/soundpad-utils"
@@ -158,7 +158,8 @@ export class MouSoundPads extends MouApplication {
       categories,
       creator: this.creator,
       'noAsset': this.sounds!.length == 0, 
-      'volume': (foundry as AnyDict).audio.AudioHelper.volumeToInput(MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME)) 
+      'volume': (foundry as AnyDict).audio.AudioHelper.volumeToInput(MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME)),
+      'channel': MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL),
     }
   }
 
@@ -270,6 +271,7 @@ export class MouSoundPads extends MouApplication {
 
     // keep in settings
     html.find('.sound-volume').on("change", event => this._onSoundVolume(event));
+    html.find('.sound-channel').on("change", event => this._onSoundChannel(event));
 
     // toggle visibility
     html.find('.toggleVisibility').on("click", event => {
@@ -350,6 +352,15 @@ export class MouSoundPads extends MouApplication {
       MouApplication.setSettings(SETTINGS_SOUNDPAD_VOLUME, volume);
     }
   }
+
+  private _onSoundChannel(event : JQuery.ChangeEvent) {
+    event.preventDefault();
+    const channel = event.currentTarget as HTMLSelectElement;
+    if ((game as Game).user!.isGM) {
+      MouApplication.setSettings(SETTINGS_SOUNDPAD_CHANNEL, channel.value);
+    }
+  }
+
 
   /**
    * Handles the mouse down (right click) event on soundpad elements.
@@ -522,9 +533,10 @@ export class MouSoundPads extends MouApplication {
 
       // adjust volume
       const volume = MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME)
+      const channel = MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL)
 
       // play sound (reset URL)
-      playlist!.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, path: sound.path, playing: !sound.playing, volume: volume}]);
+      playlist!.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, path: sound.path, playing: !sound.playing, volume: volume, channel: channel}]);
 
       // show warning
       if(userMayNotDownload) {
