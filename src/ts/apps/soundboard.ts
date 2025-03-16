@@ -1,6 +1,6 @@
 import { AnyDict } from "../types.js"
 import MouApplication from "./application.js"
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS } from "../constants.js"
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS } from "../constants.js"
 import { MouSoundboardEdit } from "./soundboard-edit.js"
 import { MouSoundboardUtils } from "../utils/soundboard-utils.js"
 import MouMediaUtils from "../utils/media-utils.js"
@@ -13,6 +13,7 @@ export class MouSoundboard extends Application {
   private rows: number = 1
   private initialized: boolean = false
   private playing: AnyDict = {};
+  private showList: boolean = false
 
   static override get defaultOptions() {
     return foundry.utils.mergeObject(super.defaultOptions, {
@@ -34,14 +35,15 @@ export class MouSoundboard extends Application {
     }
 
     return { 
-      sounds: this.updateSounds()
+      sounds: this.updateSounds(),
+      boards: this.showList ? await MouApplication.getSounboardList() : null,
     }
   }
 
   private updateSounds() : AnyDict[] {
-    const settings = MouApplication.getUserSoundboard()
-    this.cols = "cols" in settings ? settings["cols"] : 10
-    this.rows = "rows" in settings ? settings["rows"] : 1
+    const soundboard = MouApplication.getUserSoundboard()
+    this.cols = "cols" in soundboard ? soundboard["cols"] : MouConfig.DEFAULT_COLS
+    this.rows = "rows" in soundboard ? soundboard["rows"] : MouConfig.DEFAULT_ROWS
 
     const allSounds = []
     const sounds = []
@@ -49,8 +51,8 @@ export class MouSoundboard extends Application {
       const row = []
       for(let c=0; c<this.cols; c++) {
         const i = 1 + (r*this.cols) + c
-        if(Object.keys(settings).includes(`audio-${r}#${c}`)) {
-          const audio = foundry.utils.duplicate(settings[`audio-${r}#${c}`])
+        if(Object.keys(soundboard).includes(`audio-${r}#${c}`)) {
+          const audio = foundry.utils.duplicate(soundboard[`audio-${r}#${c}`])
           audio.id = `${r}#${c}`
           audio.idx = i
           row.push(audio)
@@ -94,35 +96,43 @@ export class MouSoundboard extends Application {
     const parent = this
 
     // resize windows to fit columns (16 is the padding (8))
-    this.setPosition({"width": MouSoundboard.CELL_SIZE * this.cols + 16})
+    const boardWidth = MouSoundboard.CELL_SIZE * this.cols
+    this.setPosition({"width": boardWidth + 16 + (this.showList ? 150 : 0)})
+    html.find(".sounds").css("max-width", `${boardWidth}px`)
 
     // retrieve settings
-    const settings = MouApplication.getUserSoundboard()
+    const currentUserSoundboard = MouApplication.getUserSoundboard()
 
     html.find(".addRow").on("click", () => {
       this.rows = Math.min(this.rows+1, MouConfig.MAX_ROWS)
-      settings.rows = this.rows
-      MouApplication.setUserSoundboard(settings).then(() => parent.render(true))
+      currentUserSoundboard.rows = this.rows
+      MouApplication.setUserSoundboard(currentUserSoundboard).then(() => parent.render(true))
     })
     html.find(".remRow").on("click", () => {
       this.rows = Math.max(this.rows-1, 1)
-      settings.rows = this.rows
-      MouApplication.setUserSoundboard(settings).then(() => parent.render(true))
+      currentUserSoundboard.rows = this.rows
+      MouApplication.setUserSoundboard(currentUserSoundboard).then(() => parent.render(true))
     })
     html.find(".addCol").on("click", () => {
       this.cols = Math.min(this.cols+1, MouConfig.MAX_COLS)
-      settings.cols = this.cols
-      MouApplication.setUserSoundboard(settings).then(() => parent.render(true))
+      currentUserSoundboard.cols = this.cols
+      MouApplication.setUserSoundboard(currentUserSoundboard).then(() => parent.render(true))
     })
     html.find(".remCol").on("click", () => {
       this.cols = Math.max(this.cols-1, 1)
-      settings.cols = this.cols
-      MouApplication.setUserSoundboard(settings).then(() => parent.render(true))
+      currentUserSoundboard.cols = this.cols
+      MouApplication.setUserSoundboard(currentUserSoundboard).then(() => parent.render(true))
     })
 
     html.find(".export").on("click", () => {
       const filename = `moulinette-${((game as Game).world as AnyDict).title.slugify()}-soundboard.json`
       const data = MouApplication.getUserSoundboard()
+      saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
+    })
+
+    html.find(".exportAll").on("click", () => {
+      const filename = `moulinette-${((game as Game).world as AnyDict).title.slugify()}-all-soundboard.json`
+      const data = MouApplication.getSettings(SETTINGS_SOUNDBOARDS) as AnyDict
       saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
     })
 
@@ -146,7 +156,7 @@ export class MouSoundboard extends Application {
                 const keys = Object.keys(data)
                 if(keys.length > 0 && keys[0].startsWith("fav")) {
                   const settings = MouApplication.getUserSoundboard()
-                  const cols = settings.cols ? settings.cols : 10
+                  const cols = settings.cols ? settings.cols : MouConfig.DEFAULT_COLS
                   const dataV2 = {} as AnyDict
                   for(const k of keys) {
                     // generate new key (compatible with v2)
@@ -174,21 +184,133 @@ export class MouSoundboard extends Application {
             label: (game as Game).i18n.localize("MOUSND.cancel")
           }
         },
-        default: (game as Game).i18n.localize("MOUSND.import")
+        default: "import"
       }, {
         width: 400
       }).render(true);
     })
 
-    html.find(".delete").on("click", () => {
+    html.find(".importAll").on("click", async function() {
+      new Dialog({
+        title: `Import Data: Moulinette Soundboard Collection`,
+        content: await renderTemplate("templates/apps/import-data.html", {
+          hint1: (game as Game).i18n.format("DOCUMENT.ImportDataHint1", {document: "soundboard collection"}),
+          hint2: (game as Game).i18n.format("DOCUMENT.ImportDataHint2", {name: "this soundboard collection"})
+        }),
+        buttons: {
+          import: {
+            icon: '<i class="fas fa-file-import"></i>',
+            label: "Import",
+            callback: html => {
+              const form = (html as JQuery<HTMLElement>).find("form")[0];
+              if ( !form.data.files.length ) return ui.notifications?.error("You did not upload a data file!");
+              readTextFromFile(form.data.files[0]).then(json => {
+                const data = JSON.parse(json)
+                MouApplication.setSettings(SETTINGS_SOUNDBOARDS, data).then(() => parent.render(true))
+              });
+            }
+          },
+          no: {
+            icon: '<i class="fa-solid fa-times"></i>',
+            label: (game as Game).i18n.localize("MOUSND.cancel")
+          }
+        },
+        default: "import"
+      }, {
+        width: 400
+      }).render(true);
+    })
+
+    html.find(".delete").on("click", (event: Event) => {
+      const boardIdx = $(event.currentTarget as HTMLLinkElement).closest("li").data("idx")
+      const userSoundboard = MouApplication.getUserSoundboard(boardIdx)
+
       return Dialog.confirm({
         title: `${(game as Game).i18n.localize("MOUSND.delete_tooltip")}`,
-        content: `${(game as Game).i18n.localize("MOUSND.delete_warning")}`,
+        content: `${(game as Game).i18n.format("MOUSND.delete_warning", { name: userSoundboard.name})}`,
         yes: () => {
-          MouApplication.setUserSoundboard({}).then(() => parent.render(true))
+          MouApplication.deleteSoundboard(boardIdx).then(() => {
+            parent.render(true)
+          })
         }
       });
     })
+
+    html.find(".addBoard").on("click", async () => {
+      new Dialog({
+        title: (game as Game).i18n.localize("MOUSND.add_board_tooltip"),
+        content: await renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
+          name: ""
+        }),
+        buttons: {
+          create: {
+            icon: '<i class="fa-solid fa-plus-square"></i>',
+            label: `${(game as Game).i18n.localize("MOUSND.create")}`,
+            callback: html => {
+              const name = (html as JQuery<HTMLElement>).find("input").val() as string
+              if(name.length < 3) {
+                throw new Error("MouSoundboards | Soundboard name must be at least 3 characters long.")
+              }
+              MouApplication.createSoundboard(name).then(() => {
+                parent.render(true)
+              })
+            }
+          },
+          cancel: {
+            icon: '<i class="fa-solid fa-times"></i>',
+            label: (game as Game).i18n.localize("MOUSND.cancel")
+          }
+        },
+        default: "create"
+      }, {
+        width: 200
+      }).render(true);
+    })
+
+    html.find(".edit").on("click", async (event: Event) => {
+      const boardIdx = $(event.currentTarget as HTMLLinkElement).closest("li").data("idx")
+      const userSoundboard = MouApplication.getUserSoundboard(boardIdx)
+              
+      new Dialog({
+        title: (game as Game).i18n.localize("MOUSND.edit_tooltip"),
+        content: await renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
+          name: userSoundboard.name
+        }),
+        buttons: {
+          ok: {
+            icon: '<i class="fa-solid fa-pen-to-square"></i>',
+            label: `${(game as Game).i18n.localize("MOUSND.rename")}`,
+            callback: html => {
+              const name = (html as JQuery<HTMLElement>).find("input").val() as string
+              if(name.length < 3) {
+                throw new Error("MouSoundboards | Soundboard name must be at least 3 characters long.")
+              }
+              userSoundboard.name = name
+              MouApplication.setUserSoundboard(userSoundboard, boardIdx).then(() => parent.render(true))
+            }
+          },
+          cancel: {
+            icon: '<i class="fa-solid fa-times"></i>',
+            label: (game as Game).i18n.localize("MOUSND.cancel")
+          }
+        },
+        default: "ok"
+      }, {
+        width: 200
+      }).render(true);
+    })
+
+    html.find(".sndBoard").on("click", async (event: Event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const boardIdx = $(event.currentTarget as HTMLLinkElement).closest("li").data("idx")
+      MouApplication.setCurrentSoundboard(boardIdx).then(() => parent.render(true))
+    })
+
+    html.find(".list").on("click", () => {
+      this.showList = !this.showList
+      parent.render()
+    });
 
 
     html.find('.snd.used').on("click", ev => this._playSound(ev))

@@ -9,9 +9,43 @@
     color: red;
   }
 
+  .board {
+    display: flex;
+  }
+
+  .board_list {
+    flex-grow: 1;
+    margin-left: 10px;
+    padding: 0px 5px;
+    border-left: 1px solid rgba(0, 0, 0, 0.5);
+
+    .options {
+      position: absolute;
+      bottom: 5px;
+      width: 130px;
+    }
+
+    li {
+      display: flex;
+
+      .sndBoard {
+        flex-grow: 1;
+
+        i { margin-left: 3px; }
+      }
+
+      a.edit { color: #777 }
+      a.delete { color: darkred; padding-left: 5px }
+    }
+  }
+
   .boardrow {
     display: flex;
     align-items: center;
+  }
+
+  .sounds {
+    overflow: hidden;
   }
 
   .snd {
@@ -116,8 +150,15 @@
   .options {
     display: flex;
 
-    .delete {
-      color: darkred;
+    .list {
+      margin-left: 10px;
+      color: darkgreen;
+    }
+
+    .options_list {
+      display: flex;
+      width: 200px;
+      flex-direction: row-reverse;
     }
 
     i {

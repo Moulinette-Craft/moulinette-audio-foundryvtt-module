@@ -27,6 +27,8 @@ export default class MouConfig {
   /** Soundboards */
   static MAX_ROWS = 30 // max number of allowed rows
   static MAX_COLS = 30 // max number of allowed columns
+  static DEFAULT_ROWS = 3
+  static DEFAULT_COLS = 10
 
   /** Soundpads */
   static AMBIENT_SOUND_RADIUS = 10 // default radius used for ambient sounds (drag & drop action)
