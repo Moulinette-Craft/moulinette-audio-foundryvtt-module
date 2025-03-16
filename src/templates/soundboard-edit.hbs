@@ -71,6 +71,12 @@
       <button type="submit" class="buttonSize size1 {{#if size1}}selected{{/if}}">1</button>
       <button type="submit" class="buttonSize size2 {{#if size2}}selected{{/if}}">2</button>
       <button type="submit" class="buttonSize size3 {{#if size3}}selected{{/if}}">3</button>
+      <button type="submit" class="buttonSize size12 {{#if size12}}selected{{/if}}">1x2</button>
+      <button type="submit" class="buttonSize size13 {{#if size13}}selected{{/if}}">1x3</button>
+      <button type="submit" class="buttonSize size22 {{#if size22}}selected{{/if}}">2x2</button>
+      <button type="submit" class="buttonSize size23 {{#if size23}}selected{{/if}}">2x3</button>
+      <button type="submit" class="buttonSize size32 {{#if size32}}selected{{/if}}">3x2</button>
+      <button type="submit" class="buttonSize size33 {{#if size33}}selected{{/if}}">3x3</button>
     </div>
   </div>
   <p>  
@@ -102,13 +108,15 @@
           {{#if data.faIcon}}<i class="{{data.icon}}" title="{{data.name}}"></i>{{/if}}
           {{#unless data.faIcon}}<img class="icon" title="{{data.name}}" src="{{data.icon}}"/>{{/unless}}
         {{/if}}
-        {{#unless data.faIcon}}
-          {{#if data.name}}{{data.name}}{{/if}}
-          {{#unless data.name}}{{data.idx}}{{/unless}}
+        {{#unless data.icon}}
+          <p>
+            {{#if data.name}}{{data.name}}{{/if}}
+            {{#unless data.name}}{{data.idx}}{{/unless}}
+          </p>
         {{/unless}}
         </div>
       {{/if}}
-      {{#unless data.path.length}}<div class="snd unused">{{data.idx}}</div>{{/unless}}
+      {{#unless data.path.length}}<div class="snd unused"><p>{{data.idx}}</p></div>{{/unless}}
       <div><i class="fas fa-arrow-left"></i> {{localize "MOUSND.play_stop_audio"}}</div>
     </div>
   </div>

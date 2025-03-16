@@ -1,6 +1,6 @@
 import { AnyDict } from "../types.js"
 import MouApplication from "./application.js"
-import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS } from "../constants.js"
+import MouConfig, { MODULE_ID, SETTINGS_SOUNDBOARD_ALLOW_PLAYERS, SETTINGS_SOUNDBOARDS, SLOT_SIZES } from "../constants.js"
 import { MouSoundboardEdit } from "./soundboard-edit.js"
 import { MouSoundboardUtils } from "../utils/soundboard-utils.js"
 import MouMediaUtils from "../utils/media-utils.js"
@@ -75,7 +75,10 @@ export class MouSoundboard extends Application {
           }
           // button size is larger
           if(audio.size && audio.size > 1) {
-            c += audio.size-1
+            const slotSize = SLOT_SIZES.find((s) => s.class == audio.size)
+            if(slotSize) {
+              c += slotSize.merged-1
+            }
           }
         } else {
           row.push({ id: `${r}#${c}`, idx: i })
@@ -361,7 +364,10 @@ export class MouSoundboard extends Application {
           }
           settings["audio-" + toSlot] = fromAudio
           if(overwrite) {
-            delete settings["audio-" + fromSlot]
+            // holding key => copy/duplicate
+            if(!event.ctrlKey) {
+              delete settings["audio-" + fromSlot]
+            }
           } else {
             settings["audio-" + fromSlot] = toAudio
           }
@@ -422,7 +428,6 @@ export class MouSoundboard extends Application {
     // right click only
     if(force || event.which == 3) {
       const slot = event.currentTarget.dataset.slot;
-      
       let settings = MouApplication.getUserSoundboard()
       
       const row = Number(slot.split('#')[0])
@@ -438,6 +443,20 @@ export class MouSoundboard extends Application {
       const moulinette = new MouSoundboardEdit(data, slot, this)
       moulinette.options.title = (game as Game).i18n.localize("MOUSND.edit_slot")
       moulinette.render(true)
+    }
+    // middle click
+    else if(event.which == 2) {
+      const slot = event.currentTarget.dataset.slot;
+      let soundboard = MouApplication.getUserSoundboard()
+      if(Object.keys(soundboard).includes("audio-" + slot)) {
+        const dialogDecision = await Dialog.confirm({
+          title: (game as Game).i18n.localize("MOUSND.delete_slot"),
+          content: (game as Game).i18n.format("MOUSND.delete_slot_content", { from: slot }),
+        })
+        if(!dialogDecision) return;
+        delete soundboard["audio-" + slot]
+        MouApplication.setUserSoundboard(soundboard).then(() => this.render())
+      }
     }
   }
 

@@ -1,10 +1,10 @@
-import { MODULE_ID } from "../constants"
+import { MODULE_ID, SLOT_SIZES } from "../constants"
 import { AnyDict } from "../types"
 import MouMediaUtils from "../utils/media-utils"
 import MouApplication from "./application"
 import { MouSoundboard } from "./soundboard"
 
-export class MouSoundboardEdit extends Application {
+export class MouSoundboardEdit extends MouApplication {
     
   private data: AnyDict
   private slot: string
@@ -41,7 +41,7 @@ export class MouSoundboardEdit extends Application {
     const audio = [] as AnyDict
     const settings = MouApplication.getUserSoundboard()
     this.data.path.forEach((p : string) => audio.push({'name' : MouMediaUtils.prettyMediaName(p), 'path': p}))
-    return {
+    const data = {
       data: this.data, 
       audio: audio,
       canBrowse: (game as Game).permissions?.FILES_BROWSE.includes((game as any).user.role),
@@ -52,10 +52,10 @@ export class MouSoundboardEdit extends Application {
       fade: this.data.fade,
       channel: "channel" in this.data ? this.data.channel : "environment",
       exists: Object.keys(settings).includes("audio-" + this.slot),
-      size1: !this.data.size || this.data.size == 1,
-      size2: this.data.size == 2,
-      size3: this.data.size == 3
-    }
+    } as AnyDict;
+    data["size" + (this.data.size || 1)] = true;
+    console.log(data)
+    return data;
   }
   
   async _onClick(event: Event) {
@@ -120,11 +120,6 @@ export class MouSoundboardEdit extends Application {
       const settings = MouApplication.getUserSoundboard()
       if(this.data.path.length == 0) {
         return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_soundboard_noaudio"));
-      }
-
-      // remove icon size for icon button
-      if(this.data.icon && this.data.size) {
-        delete this.data.size
       }
 
       // check if fade is a number
@@ -212,18 +207,19 @@ export class MouSoundboardEdit extends Application {
   _updateAudioButtonLayout() {
     const button = this.html?.find(".sounds .snd") as JQuery<HTMLElement>
     // reset size
-    button.removeClass("size1")
-    button.removeClass("size2")
-    button.removeClass("size3")
+    for(const size of SLOT_SIZES) {
+      button.removeClass("size" + size.class)
+    }
     // no sound selected
     if(this.data.path.length == 0) {
       button.removeClass("used")
       button.addClass("unused")
-      button.text(this.data.idx)
+      button.find("p").text(this.data.idx)
     }
     else {
       button.addClass("used")
       button.removeClass("unused")
+      button.addClass("size" + this.data.size)
       if(this.data.icon) {
         if(this.data.faIcon) {
           button.html(`<i class="${this.data.icon}" title="${this.data.name}"></i>`)
@@ -231,17 +227,15 @@ export class MouSoundboardEdit extends Application {
           button.html(`<img class="icon" title="${this.data.name}" src="${this.data.icon}"/>`)
         }
       } else {
-        // size only for text button
-        if(this.data.size >= 2) {
-          button.addClass("size" + this.data.size)
-        }
         if(this.data.name && this.data.name.length > 0) {
-          button.text(this.data.name)
+          button.find("p").text(this.data.name)
         } else {
-          button.text(this.data.idx)
+          button.find("p").text(this.data.idx)
         }
       } 
     }
+    // resize
+    this.autoResize()
   }
 
   override activateListeners(html: JQuery<HTMLElement>) {
@@ -287,33 +281,17 @@ export class MouSoundboardEdit extends Application {
       parent._updateAudioButtonLayout()
     })
 
-    html.find(".size1").on("click", () => {
-      parent.data.size = 1
-      parent._updateAudioButtonLayout()
-      html.find(".size1").addClass("selected")
-      html.find(".size2").removeClass("selected")
-      html.find(".size3").removeClass("selected")
-    })
-    html.find(".size2").on("click", () => {
-      if(this.data.icon) {
-        return ui.notifications?.warn((game as Game).i18n.localize("MOUSND.error_soundboard_iconsize"));
-      }
-      html.find(".size1").removeClass("selected")
-      html.find(".size2").addClass("selected")
-      html.find(".size3").removeClass("selected")
-      parent.data.size = 2
-      parent._updateAudioButtonLayout()
-    })
-    html.find(".size3").on("click", () => {
-      if(this.data.icon) {
-        return ui.notifications?.warn((game as Game).i18n.localize("MOUSND.error_soundboard_iconsize"));
-      }
-      html.find(".size1").removeClass("selected")
-      html.find(".size2").removeClass("selected")
-      html.find(".size3").addClass("selected")
-      parent.data.size = 3
-      parent._updateAudioButtonLayout()
-    })
+    for(const size of SLOT_SIZES) {
+      html.find(".size" + size.class).on("click", () => {
+        // reset classes for sizes
+        for(const s of SLOT_SIZES) {
+          html.find(".size" + s.class).removeClass("selected")
+        }
+        html.find(".size" + size.class).addClass("selected")
+        parent.data.size = size.class
+        parent._updateAudioButtonLayout()  
+      })
+    }
   }
   
 }

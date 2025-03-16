@@ -59,7 +59,8 @@
     max-height: 36px;
     box-sizing: content-box;
     font-size: 24px;
-    line-height: 36px;
+    line-height: 24px;
+    word-break: break-all;
     background: rgba(0, 0, 0, 0.5);
     box-shadow: 0 0 4px var(--color-shadow-dark);
     margin: 0 0 8px 0;
@@ -71,16 +72,58 @@
     display: inline-block;
     margin: 5px;
 
-    &.size2 {
+    p, i { 
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+      margin: 0; 
+      width: 100%;
+      height: 100%;
+    }
+
+    img {
+      width: 100%;
+      height: 100%;
+      border: 0px;
+      object-fit: cover;
+    }
+
+    &.used.size1 p {
+      font-size: 14px;
+      line-height: 14px;
+    }
+
+    &.size2, &.size22, &.size23 {
       min-width: 84px !important;
       max-width: 84px !important;
       width: 84px !important;
     }
   
-    &.size3 {
+    &.size3, &.size32, &.size33 {
       min-width: 132px !important;
       max-width: 132px !important;
       width: 132px !important;
+    }
+
+    &.size12, &.size22, &.size32 {
+      min-height: 84px !important;
+      max-height: 84px !important;
+      height: 84px !important;
+    }
+
+    &.size13, &.size23, &.size33 {
+      min-height: 132px !important;
+      max-height: 132px !important;
+      height: 132px !important;
+    }
+
+    &.size22, &.size23, &.size32 {
+      i { font-size: 48px; }
+    }
+
+    &.size33 {
+      i { font-size: 72px; }
     }
 
     .play-icon {
@@ -111,8 +154,6 @@
 
   .snd.used {
     &:hover {
-      font-weight: bold;
-      font-size: large;
       border: 1px solid red;
       border-bottom: 1px solid #ff6400;
       box-shadow: 0 0 4px #ff6400;
@@ -181,6 +222,14 @@
 
   .form-fields button {
     max-width: 32px;
+
+    &.buttonSize {
+      max-width: 40px !important;
+
+      &.selected {
+        border-color: red;
+      }
+    }
   }
 
   .actions {

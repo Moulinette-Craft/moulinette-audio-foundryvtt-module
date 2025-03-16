@@ -28,13 +28,15 @@
                 {{#if snd.faIcon}}<i class="{{snd.icon}}" title="{{snd.name}}"></i>{{/if}}
                 {{#unless snd.faIcon}}<img class="icon" title="{{snd.name}}" src="{{snd.icon}}" draggable="true"/>{{/unless}}
               {{/if}}
-              {{#unless snd.faIcon}}
-                {{#if snd.name}}{{snd.name}}{{/if}}
-                {{#unless snd.name}}{{snd.idx}}{{/unless}}
+              {{#unless snd.icon}}
+                <p>
+                  {{#if snd.name}}{{snd.name}}{{/if}}
+                  {{#unless snd.name}}{{snd.idx}}{{/unless}}
+                </p>
               {{/unless}}
               </div>
             {{/if}}
-            {{#unless snd.path.length}}<div class="snd unused" data-slot="{{snd.id}}" draggable="false">{{snd.idx}}</div>{{/unless}}
+            {{#unless snd.path.length}}<div class="snd unused" data-slot="{{snd.id}}" draggable="false"><p>{{snd.idx}}</p></div>{{/unless}}
           {{/each}}
           </div>
         {{/each}}

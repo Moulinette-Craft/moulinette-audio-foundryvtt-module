@@ -15,6 +15,17 @@ export const FOUNDRYVTT_PLAYLIST_ENTRY = "PlaylistSound"
 
 export const MOU_STORAGE = "https://mttestorage.blob.core.windows.net/"
 
+export const SLOT_SIZES = [
+  { class: 1, merged: 1}, 
+  { class: 2, merged: 2}, 
+  { class: 3, merged: 3}, 
+  { class: 12, merged: 1},
+  { class: 13, merged: 1}, 
+  { class: 22, merged: 2}, 
+  { class: 32, merged: 3}, 
+  { class: 23, merged: 2}, 
+  { class: 33, merged: 3}]
+
 /**
  * The constants below can be overridden using the following macro :
  * `game.modules.get("moulinette-soundboards").configs.[CONFIG_NAME] = [NEW_VALUE]`

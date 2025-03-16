@@ -70,6 +70,10 @@ export default class MouApplication extends Application {
     return (game as Game).settings.get(MODULE_ID, key)
   }
 
+  /** Forces FoundryVTT to automatically resize the window (when auto) */
+  autoResize() {
+    this.setPosition({ left: this.position.left, top: this.position.top, height: this.position.height, width: this.position.width})
+  }
 
   /**
    * Retrieves the soundboard settings for the current user.
