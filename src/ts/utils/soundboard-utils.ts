@@ -44,7 +44,13 @@ export class MouSoundboardUtils {
     if(sound.playing) {
       playlist.stopSound(sound)
     } else {
-      sound.update({ volume: volume })
+      const updateData : AnyDict = { 
+        volume: volume, 
+        repeat: audio.repeat, 
+        channel: "channel" in audio ? audio.channel : "environment",
+        fade: audio.fade
+      }      
+      sound.update(updateData)
       playlist.playSound(sound)
     }
   }

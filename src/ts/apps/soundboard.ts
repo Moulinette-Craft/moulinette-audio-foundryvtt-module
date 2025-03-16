@@ -243,7 +243,6 @@ export class MouSoundboard extends Application {
       }
       // drag & drop to slot
       else {
-        console.log(data)
         if(data && data.source == "mtte" && data.sound && data.pack) {
           const settings = MouApplication.getUserSoundboard()
           if(`audio-${toSlot}` in settings) {

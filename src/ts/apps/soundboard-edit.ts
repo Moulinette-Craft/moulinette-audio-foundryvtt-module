@@ -48,6 +48,9 @@ export class MouSoundboardEdit extends Application {
       canUpload: (game as Game).permissions?.FILES_UPLOAD.includes((game as any).user.role),
       multiple: Array.isArray(this.data.path), 
       volume: (foundry as AnyDict).audio.AudioHelper.volumeToInput(this.data.volume),
+      repeat: this.data.repeat,
+      fade: this.data.fade,
+      channel: "channel" in this.data ? this.data.channel : "environment",
       exists: Object.keys(settings).includes("audio-" + this.slot),
       size1: !this.data.size || this.data.size == 1,
       size2: this.data.size == 2,
@@ -123,6 +126,11 @@ export class MouSoundboardEdit extends Application {
       if(this.data.icon && this.data.size) {
         delete this.data.size
       }
+
+      // check if fade is a number
+      if("fade" in this.data && isNaN(this.data.fade)) {
+        delete this.data.fade
+      }      
 
       let audio = foundry.utils.duplicate(this.data)
       delete audio["id"]
@@ -242,7 +250,10 @@ export class MouSoundboardEdit extends Application {
 
     html.find("button").on("click", this._onClick.bind(this))
     html.find(".snd").on("click", this._onTogglePreview.bind(this))
+    html.find('.sound-channel').on("change", (event: JQuery.ChangeEvent) => { parent.data.channel = $(event.currentTarget).val() as string });
     html.find('.sound-volume').on("change", (event: JQuery.ChangeEvent) => this._onSoundVolume(event));
+    html.find('.sound-repeat').on("change", (event: JQuery.ChangeEvent) => { parent.data.repeat = $(event.currentTarget).prop("checked") });
+    html.find('.sound-fade').on("change", (event: JQuery.ChangeEvent) => { parent.data.fade = Number($(event.currentTarget).val()) });
     
     html.find('.audiofile').on("click", ev => {
       ev.preventDefault()
