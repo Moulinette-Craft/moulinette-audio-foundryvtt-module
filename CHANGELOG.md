@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add Audio channel, Repeat and Fade duration for Soundboards
 - Add Audio channel for Soundpads
+- Support more sizes (1x2, 1x3, 2x2, 2x3, 3x2 and 3x3)
+- Support icons/images with sizes different from 1x1
+- Soundboard collections
+- Toggle visibility for unused slots
 
 ## [1.0.7] - 2025-01-06
 ### Fixed

@@ -165,6 +165,10 @@
     cursor: auto;
   }
 
+  .hideUnused .snd.unused {
+    visibility: hidden;
+  }
+
   .gotoSounds {
     color: var(--color-text-hyperlink);
     text-decoration: underline;
@@ -213,6 +217,10 @@
 
     i.spacer {
       margin-left: auto;
+    }
+
+    .toggle {
+      margin-right: 15px;
     }
   }
 

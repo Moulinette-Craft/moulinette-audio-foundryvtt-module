@@ -42,6 +42,8 @@ export class MouSoundboard extends Application {
     }
 
     return { 
+      tiny: this.cols <= 4,
+      hideUnused: MouApplication.getUserSoundboard().hideUnused,
       sounds: this.updateSounds(),
       boards: this.showList ? await MouApplication.getSounboardList() : null,
     }
@@ -322,6 +324,10 @@ export class MouSoundboard extends Application {
       parent.render()
     });
 
+    html.find(".toggle").on("click", () => {
+      currentUserSoundboard.hideUnused = !currentUserSoundboard.hideUnused
+      MouApplication.setUserSoundboard(currentUserSoundboard).then(() => parent.render(true))
+    })
 
     html.find('.snd.used').on("click", ev => this._playSound(ev))
     html.find('.snd.unused').on("click", ev => this._editSound(ev, true))

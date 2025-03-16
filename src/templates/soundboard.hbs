@@ -12,17 +12,20 @@
         <a class="addRow" title="{{localize "MOUSND.add_row_tooltip"}}"><i class="fas fa-plus-circle"></i></a>
         
         <i class="spacer"></i>
+        {{#unless tiny}}
+        <a class="toggle" title="{{localize "MOUSND.toggle_tooltip"}}"><i class="fa-solid fa-eye{{#if hideUnused}}-slash{{/if}}"></i></a>
         <a class="export" title="{{localize "MOUSND.export_tooltip"}}"><i class="fas fa-file-export"></i></a>
         <a class="import" title="{{localize "MOUSND.import_tooltip"}}"><i class="fas fa-file-import"></i></a>
+        {{/unless}}
         <a class="list" title="{{localize "MOUSND.list_tooltip"}}"><i class="fa-solid fa-list"></i></a>
       </div>
 
-      <div class="sounds">
+      <div class="sounds {{#if hideUnused}}hideUnused{{/if}}">
         {{#each sounds as |rows|}}
           <div class="boardrow">
           {{#each rows as |snd|}}
             {{#if snd.path.length}}
-              <div class="snd used {{#if snd.size}}size{{snd.size}}{{/if}} {{#if snd.playing}}playing{{/if}}" data-slot="{{snd.id}}" draggable="true">
+              <div class="snd used {{#if snd.size}}size{{snd.size}}{{/if}}{{#unless snd.size}}size1{{/unless}} {{#if snd.playing}}playing{{/if}}" data-slot="{{snd.id}}" draggable="true">
               {{#if snd.playing}}<div class="play-icon">&nbsp;</div>{{/if}}
               {{#if snd.icon}}
                 {{#if snd.faIcon}}<i class="{{snd.icon}}" title="{{snd.name}}"></i>{{/if}}
