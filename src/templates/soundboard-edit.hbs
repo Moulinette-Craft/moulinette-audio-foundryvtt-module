@@ -21,7 +21,7 @@
       <button type="submit" class="browseSound" title="{{localize "MOUSND.browse_sound"}}"><i class="fas fa-folder-open"></i> </button>
     </div>
   </div>
-  <p>  
+  <p class="audionames">  
   {{#each audio as |snd i|}}
     <audio id="previewSound{{i}}" src="{{snd.path}}"></audio>
     <span class="audioname"><i class="fas fa-music"></i> {{snd.name}} <a class="audiofile" data-idx="{{i}}"><i class="fas fa-trash" title="{{localize "Delete"}}"></i></a></span>

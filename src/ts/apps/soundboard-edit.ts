@@ -101,7 +101,7 @@ export class MouSoundboardEdit extends Application {
     }
     else if(button.classList.contains("delete")) {
       // prompt confirmation
-      let settings = MouApplication.getUserSoundboard()
+      let soundboard = MouApplication.getUserSoundboard()
       const slot = `#${this.data.idx}`
       const dialogDecision = await Dialog.confirm({
         title: (game as Game).i18n.localize("MOUSND.delete_slot"),
@@ -109,8 +109,8 @@ export class MouSoundboardEdit extends Application {
       })
       if(!dialogDecision) return;
 
-      delete settings["audio-" + this.slot]
-      await MouApplication.getUserSoundboard()
+      delete soundboard["audio-" + this.slot]
+      await MouApplication.setUserSoundboard(soundboard)
       this.close()
       if(this.parent) {
         this.parent.render()

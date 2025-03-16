@@ -64,5 +64,6 @@
   "MOUSND.sounds": "Sounds",
   "MOUSND.tta_warning_nodownload": "By supporting Tabletop Audio (TTA) at the $3 per month tier, sounds are NOT downloaded and the URL will expire after 24 hours. Always play them from this UI. To build playlists or use sounds in scenes, support TTA at a higher tier. You can disable this warning in the configuration.",
   "MOUSND.volume": "Volume",
+  "MOUSND.warn_import_before_drop": "Please import the sound and then drag & drop from the playlist to the soundboard!",
   "ZMOU": ""
 }

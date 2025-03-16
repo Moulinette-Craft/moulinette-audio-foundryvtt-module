@@ -34,6 +34,13 @@ export class MouSoundboard extends Application {
       throw new Error("You're not authorized to use the Moulinette Soundboard.");
     }
 
+    // build playing sounds
+    this.playing = {}
+    for(const sound of Array.from((game as Game).audio.playing.values())) {
+      const cleanPath = MouMediaUtils.getCleanURI(sound.src)
+      this.playing[cleanPath] = true
+    }
+
     return { 
       sounds: this.updateSounds(),
       boards: this.showList ? await MouApplication.getSounboardList() : null,
@@ -365,23 +372,41 @@ export class MouSoundboard extends Application {
       }
       // drag & drop to slot
       else {
-        if(data && data.source == "mtte" && data.sound && data.pack) {
-          const settings = MouApplication.getUserSoundboard()
-          if(`audio-${toSlot}` in settings) {
-            return ui.notifications?.error((game as Game).i18n.localize("MOUSND.slot_exists")); 
+        const soundboard = MouApplication.getUserSoundboard()
+        if(`audio-${toSlot}` in soundboard) {
+          return ui.notifications?.error((game as Game).i18n.localize("MOUSND.slot_exists")); 
+        }
+        console.log(data)
+        if("moulinette" in data) {
+          ui.notifications?.warn((game as Game).i18n.localize("MOUSND.warn_import_before_drop"));
+        } else if(data.type == "PlaylistSound") {
+          const sound = await fromUuid(data.uuid) as AnyDict
+          if(sound) {
+            soundboard[`audio-${toSlot}`] = {
+              name: sound.name,
+              channel: sound.channel,
+              volume: sound.volume,
+              fade: sound.fade,
+              repeat: sound.repeat,
+              path: [sound.path]
+            }
+            await MouApplication.setUserSoundboard(soundboard).then(() => parent.render())
           }
-          /*
-          const sound = data.sound
-          await MoulinetteSoundsUtil.downloadAsset(data)
-          const name = game.moulinette.applications.Moulinette.prettyText(sound.filename.split("/").pop()).replace(".ogg","").replace(".mp3","").replace(".wav","").replace(".webm","").replace(".m4a","")
-          settings[`audio-${toSlot}`] = { 
-            name: name,
-            path: [data.path],
-            volume: (foundry as AnyDict).audio.AudioHelper.inputToVolume(data.volume) 
+        } else if(data.type == "Playlist") {
+          const playlist = await fromUuid(data.uuid) as AnyDict
+          if(playlist && playlist.sounds && playlist.sounds.size > 0) {
+            const firstSound = playlist.sounds.contents[0]
+            console.log(firstSound)
+            soundboard[`audio-${toSlot}`] = {
+              name: playlist.name,
+              channel: firstSound.channel,
+              volume: firstSound.volume,
+              fade: firstSound.fade,
+              repeat: firstSound.repeat,
+              path: playlist.sounds.contents.filter((snd : AnyDict)=> snd.path).map((snd: AnyDict) => snd.path)
+            }
+            await MouApplication.setUserSoundboard(soundboard).then(() => parent.render())
           }
-          await MouApplication.setUserSoundboard(settings)
-          */
-          parent.render()
         }
       }
     })
@@ -435,7 +460,7 @@ export class MouSoundboard extends Application {
     const cleanPath = MouMediaUtils.getCleanURI(path)
     if(!(cleanPath in this.playing)) return
     this.playing[cleanPath] = playing
-    this.render()
+    setTimeout(() => this.render(), 200)
   }
 
 }
