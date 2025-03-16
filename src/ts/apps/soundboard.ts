@@ -488,4 +488,13 @@ export class MouSoundboard extends Application {
     setTimeout(() => this.render(), 200)
   }
 
+  showSoundboardByName(name: string) {
+    const soundboards = MouApplication.getSettings(SETTINGS_SOUNDBOARDS) as AnyDict
+    for(let idx = 0; idx < soundboards.boards.length; idx++) {
+      if(soundboards.boards[idx].name == name) {
+        MouApplication.setCurrentSoundboard(idx).then(() => this.render(true))
+        return
+      }
+    }
+  }
 }

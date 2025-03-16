@@ -4,7 +4,13 @@
   "title": "Soundboard & Soundpad (by Moulinette)",
   "description": "A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators like Tabletop Audio and Michael Ghelfi Studios (requires supporting them).",
   "version": "VERSION",
-  "packs": [],
+  "packs": [{
+    "label": "Soundboards Macros",
+    "type": "Macro",
+    "name": "soundboards-macros",
+    "path": "packs/soundboards-macros",
+    "flags": {}
+  }],
   "relationships": {},
   "scripts": [],
   "socket": true,
