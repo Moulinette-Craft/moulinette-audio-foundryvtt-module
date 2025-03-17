@@ -33,7 +33,7 @@ jobs:
 
       - name: Create zip archive
         working-directory: dist
-        run: zip -r ./module.zip module.json style.css scripts/ templates/ languages/ img/
+        run: zip -r ./module.zip module.json style.css scripts/ templates/ languages/ img/ packs/
 
       - name: Update release with files
         id: create_version_release
