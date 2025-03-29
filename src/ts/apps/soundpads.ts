@@ -531,7 +531,7 @@ export class MouSoundPads extends MouApplication {
         sound = (await playlist!.createEmbeddedDocuments("PlaylistSound", [sound], {}))[0]
       }
 
-      // adjust volume
+      // adjust volume & channel
       const volume = MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME)
       const channel = MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL)
 
@@ -642,6 +642,7 @@ export class MouSoundPads extends MouApplication {
         const asset = parent.sounds![soundIdx-1]
         const start = asset.audio.duration && asset.audio.duration > 20 ? asset.audio.duration / 2 : 0
         parent.previewSound.src = `${MOU_STORAGE}${asset.pack.creator_ref}/${asset.pack.path}/${asset.uri}` + (start > 0 ? `#t=${start}` : "")
+        parent.previewSound.volume = Number(MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME))
         parent.previewSound.play();
       }
     }, 1000);
