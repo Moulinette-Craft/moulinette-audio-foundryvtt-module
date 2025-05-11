@@ -57,7 +57,7 @@ export class MouSoundpadUtils {
     return three && !fiveOrMore
   }
 
-    /**
+  /**
    * Reads a given URL (json) and builds an asset index
    */
   static async getSoundpadSounds(creator: string) : Promise<{ assets: AnyDict[], packs: AnyDict[] }> {

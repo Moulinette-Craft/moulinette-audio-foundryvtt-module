@@ -59,22 +59,29 @@ Hooks.once("ready", () => {
   if ((game as Game).user?.isGM) {
     // insert
     const moulinette = MouApplication.getMoulinetteModule()
-    if(moulinette && moulinette.tools) {
-      moulinette.tools.push({ 
-          name: "soundboard", 
-          icon: "mou-icon mou-soundboard", 
-          title: (game as Game).i18n.localize("MOUSND.soundboard"),
-          button: true, 
-          onClick: () => { module.soundboard.render(true) } 
-        })
+    console.log("Moulinette", moulinette)
 
-      moulinette.tools.push({ 
-          name: "soundpads", 
-          icon: "mou-icon mou-soundpad", 
-          title: (game as Game).i18n.localize("MOUSND.soundpads"),
-          button: true, 
-          onClick: () => { module.soundpads.render(true) } 
-        })
+    const soundboard = { 
+      name: "soundboard", 
+      icon: "mou-icon mou-soundboard", 
+      title: (game as Game).i18n.localize("MOUSND.soundboard"),
+      button: true, 
+      onClick: () => { module.soundboard.render(true) } 
+    }
+    const soundpads = { 
+      name: "soundpads", 
+      icon: "mou-icon mou-soundpad", 
+      title: (game as Game).i18n.localize("MOUSND.soundpads"),
+      button: true, 
+      onClick: () => { module.soundpads.render(true) } 
+    }
+
+    if((game as Game).version.startsWith("12.") && moulinette && moulinette.tools) {
+      moulinette.tools.push(soundboard)
+      moulinette.tools.push(soundpads)
+    } else if(moulinette && moulinette.buttons) {
+      moulinette.buttons.moulinette.tools["soundboard"] = soundboard
+      moulinette.buttons.moulinette.tools["soundpads"] = soundpads
     }
 
     (game as any).socket.on(`module.${MODULE_ID}`, async function(data: AnyDict) {
@@ -88,8 +95,9 @@ Hooks.once("ready", () => {
   }
 });
 
-Hooks.on("renderSidebarTab", async (app : any, html : JQuery<HTMLElement>) => {
+Hooks.on("renderPlaylistDirectory",async (app : any, html : JQuery<HTMLElement>) => {
   
+  console.log("renderPlaylistDirectory", app, html)
   // only available for GM and players if enabled
   if(!(game as Game).user?.isGM && !MouApplication.getSettings(SETTINGS_SOUNDBOARD_ALLOW_PLAYERS)) {
     return
@@ -97,12 +105,17 @@ Hooks.on("renderSidebarTab", async (app : any, html : JQuery<HTMLElement>) => {
   
   if (app.id == 'playlists') {
     const btn = await renderTemplate(`modules/${MODULE_ID}/templates/playlist-button.hbs`, {})
-    html.find(".directory-footer").append(btn);
-    html.find("#mou-soundboard-open").on("click", () => {
-      module.soundboard.render(true)
+    $(html).find(".directory-footer").append(btn);
+    $(html).find("#mou-soundboard-open").on("click", () => {
+      if(module.soundboard.rendered) {
+        module.soundboard.close()
+      } else {
+        module.soundboard.render(true)
+      }
     });
   }
 });
+
 
 Hooks.on("preUpdatePlaylist", (playlist : Playlist, updateData: any) => {
   MouSoundboardUtils.updatePlayingSound(playlist, updateData)
