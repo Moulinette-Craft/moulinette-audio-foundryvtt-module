@@ -76,10 +76,12 @@ Hooks.once("ready", () => {
       onClick: () => { module.soundpads.render(true) } 
     }
 
-    if((game as Game).version.startsWith("12.") && moulinette && moulinette.tools) {
+    if(moulinette && moulinette.tools) {
       moulinette.tools.push(soundboard)
       moulinette.tools.push(soundpads)
-    } else if(moulinette && moulinette.buttons) {
+    }
+    // v13+
+    if(moulinette && moulinette.buttons) {
       moulinette.buttons.moulinette.tools["soundboard"] = soundboard
       moulinette.buttons.moulinette.tools["soundpads"] = soundpads
     }
