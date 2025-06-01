@@ -1,5 +1,4 @@
 {
-  "$schema": "https://json.schemastore.org/foundryvtt-module-manifest.json",
   "id": "moulinette-soundboards",
   "title": "Soundboard & Soundpad (by Moulinette)",
   "description": "A soundboard to organize your audio and play it effortlessly. Includes sound and music boards from creators like Tabletop Audio and Michael Ghelfi Studios (requires supporting them).",

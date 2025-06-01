@@ -55,11 +55,10 @@ Hooks.once("init", () => {
 Hooks.once("ready", () => {
   // make config available
   module.configs = MouConfig
-
+  
   if ((game as Game).user?.isGM) {
     // insert
     const moulinette = MouApplication.getMoulinetteModule()
-    console.log("Moulinette", moulinette)
 
     const soundboard = { 
       name: "soundboard", 
@@ -76,12 +75,12 @@ Hooks.once("ready", () => {
       onClick: () => { module.soundpads.render(true) } 
     }
 
-    if(moulinette && moulinette.tools) {
+    if(moulinette?.tools) {
       moulinette.tools.push(soundboard)
       moulinette.tools.push(soundpads)
     }
     // v13+
-    if(moulinette && moulinette.buttons) {
+    if(moulinette?.buttons?.moulinette?.tools) {
       moulinette.buttons.moulinette.tools["soundboard"] = soundboard
       moulinette.buttons.moulinette.tools["soundpads"] = soundpads
     }
@@ -99,7 +98,6 @@ Hooks.once("ready", () => {
 
 Hooks.on("renderPlaylistDirectory",async (app : any, html : JQuery<HTMLElement>) => {
   
-  console.log("renderPlaylistDirectory", app, html)
   // only available for GM and players if enabled
   if(!(game as Game).user?.isGM && !MouApplication.getSettings(SETTINGS_SOUNDBOARD_ALLOW_PLAYERS)) {
     return
