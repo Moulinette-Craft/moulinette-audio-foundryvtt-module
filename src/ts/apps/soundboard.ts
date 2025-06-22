@@ -148,10 +148,12 @@ export class MouSoundboard extends Application {
       saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
     })
 
+    const v12 = (game as Game).version.startsWith("12.")
+
     html.find(".import").on("click", async function() {
       new Dialog({
         title: `Import Data: Moulinette Soundboard`,
-        content: await renderTemplate("templates/apps/import-data.html", {
+        content: await renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
           hint1: (game as Game).i18n.format("DOCUMENT.ImportDataHint1", {document: "soundboard"}),
           hint2: (game as Game).i18n.format("DOCUMENT.ImportDataHint2", {name: "this soundboard"})
         }),
@@ -205,7 +207,7 @@ export class MouSoundboard extends Application {
     html.find(".importAll").on("click", async function() {
       new Dialog({
         title: `Import Data: Moulinette Soundboard Collection`,
-        content: await renderTemplate("templates/apps/import-data.html", {
+        content: await renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
           hint1: (game as Game).i18n.format("DOCUMENT.ImportDataHint1", {document: "soundboard collection"}),
           hint2: (game as Game).i18n.format("DOCUMENT.ImportDataHint2", {name: "this soundboard collection"})
         }),

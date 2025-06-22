@@ -4,10 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.2.2] - 2025-05-11
+## [1.2.3] - 2025-05-11
 ### Fixed
 - 1.2.1: Sounds controls disappears from menu when switching scenes
 - 1.2.2: Errors on startup (ready())
+- 1.2.3: Import Config error persists v1.7.1 #8
 ### Added
 - Support for FoundryVTT v.13
 
