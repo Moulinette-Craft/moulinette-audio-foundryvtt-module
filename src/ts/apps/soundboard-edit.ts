@@ -5,7 +5,23 @@ import MouApplication from "./application"
 import { MouSoundboard } from "./soundboard"
 
 export class MouSoundboardEdit extends MouApplication {
-    
+
+  static DEFAULT_OPTIONS = {
+    id: "mou-soundboard-edit",
+    classes: ["mou"],
+    window: {
+      title: "MOUSND.edit_slot",
+    },
+    position: {
+      width: 500,
+      height: "auto"
+    }
+  };
+
+  static PARTS = {
+    content: { template: `modules/${MODULE_ID}/templates/soundboard-edit.hbs` }
+  };
+
   private data: AnyDict
   private slot: string
   private parent: MouSoundboard
@@ -23,21 +39,8 @@ export class MouSoundboardEdit extends MouApplication {
       this.data.volume = 1.0
     }
   }
-  
-  static override get defaultOptions() {
-    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
-      id: "mou-soundboard-edit",
-      classes: ["mou"],
-      title: (game as Game).i18n!.localize("MOUSND.edit_slot"),
-      template: `modules/${MODULE_ID}/templates/soundboard-edit.hbs`,
-      width: 500,
-      height: "auto",
-      closeOnSubmit: true,
-      submitOnClose: false,
-    });
-  }
-  
-  override getData() {
+
+  async _prepareContext(_options: AnyDict) {
     const audio = [] as AnyDict
     const settings = MouApplication.getUserSoundboard()
     this.data.path.forEach((p : string) => audio.push({'name' : MouMediaUtils.prettyMediaName(p), 'path': p}))
@@ -54,7 +57,6 @@ export class MouSoundboardEdit extends MouApplication {
       exists: Object.keys(settings).includes("audio-" + this.slot),
     } as AnyDict;
     data["size" + (this.data.size || 1)] = true;
-    console.log(data)
     return data;
   }
   
@@ -240,7 +242,14 @@ export class MouSoundboardEdit extends MouApplication {
     this.autoResize()
   }
 
-  override activateListeners(html: JQuery<HTMLElement>) {
+  /**
+   * V2: activateListeners(html) is replaced by _onRender(context, options).
+   * jQuery is kept intentionally (still fully supported) to minimize the diff
+   * against the rest of the (still jQuery-based) codebase.
+   */
+  async _onRender(context: AnyDict, options: AnyDict) {
+    await super._onRender(context, options)
+    const html = $((this as AnyDict).element as HTMLElement)
     const parent = this
     this.html = html
 

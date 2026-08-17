@@ -5,9 +5,11 @@ import { MouSoundboardEdit } from "./soundboard-edit.js"
 import { MouSoundboardUtils } from "../utils/soundboard-utils.js"
 import MouMediaUtils from "../utils/media-utils.js"
 
-export class MouSoundboard extends Application {
+export class MouSoundboard extends MouApplication {
 
   static CELL_SIZE = 36 + 2 + 10 // border(1x2) & margin(5x2)
+
+  override APP_NAME = "MouSoundboard";
 
   private cols: number = 10
   private rows: number = 1
@@ -15,21 +17,27 @@ export class MouSoundboard extends Application {
   private playing: AnyDict = {};
   private showList: boolean = false
 
-  static override get defaultOptions() {
-    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
-      id: "mou-soundboard",
-      classes: ["mou"],
-      title: (game as Game).i18n!.localize("MOUSND.soundboard"),
-      template: `modules/${MODULE_ID}/templates/soundboard.hbs`,
-      width: 100,
-      height: "auto",
+  static DEFAULT_OPTIONS = {
+    id: "mou-soundboard",
+    classes: ["mou"],
+    window: {
+      title: "MOUSND.soundboard", // auto-localized by ApplicationV2 if the key exists
       minimizable: true,
-      closeOnSubmit: false,
-      submitOnClose: false
-    });
+      resizable: false
+    },
+    position: {
+      width: 100,
+      height: "auto"
+    }
   }
-  
-  override async getData() {
+
+  static PARTS = {
+    main: {
+      template: `modules/${MODULE_ID}/templates/soundboard.hbs`
+    }
+  }
+
+  async _prepareContext(_options: AnyDict) {
     if(!(game as Game).user?.isGM && !MouApplication.getSettings(SETTINGS_SOUNDBOARD_ALLOW_PLAYERS)) {
       throw new Error("You're not authorized to use the Moulinette Soundboard.");
     }
@@ -101,15 +109,18 @@ export class MouSoundboard extends Application {
   }
 
   /**
-   * Implements listeners
+   * Implements listeners (ApplicationV2: this.element is the full window; jQuery kept for minimal diff)
    */
-  override activateListeners(html: JQuery<HTMLElement>) {
+  async _onRender(context: AnyDict, options: AnyDict) {
+    await super._onRender(context, options)
+
+    const html = $((this as AnyDict).element) as JQuery<HTMLElement>
     // reference to this instance
     const parent = this
 
     // resize windows to fit columns (16 is the padding (8))
     const boardWidth = MouSoundboard.CELL_SIZE * this.cols
-    this.setPosition({"width": boardWidth + 16 + (this.showList ? 150 : 0)})
+    ;(this as AnyDict).setPosition({"width": boardWidth + 16 + (this.showList ? 150 : 0)})
     html.find(".sounds").css("max-width", `${boardWidth}px`)
 
     // retrieve settings
@@ -429,7 +440,7 @@ export class MouSoundboard extends Application {
       event.preventDefault();
     })
 
-    this.bringToTop()
+    ;(this as AnyDict).bringToFront()
   }
 
   async _editSound(event: any, force = false) {
@@ -449,7 +460,7 @@ export class MouSoundboard extends Application {
       }
       data.idx = row * this.cols + col + 1
       const moulinette = new MouSoundboardEdit(data, slot, this)
-      moulinette.options.title = (game as Game).i18n!.localize("MOUSND.edit_slot")
+      ;(moulinette as AnyDict).options.window.title = (game as Game).i18n!.localize("MOUSND.edit_slot")
       moulinette.render(true)
     }
     // middle click

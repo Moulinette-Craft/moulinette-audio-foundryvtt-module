@@ -17,10 +17,32 @@ export class MouSoundPads extends MouApplication {
     michaelghelfi : "Michael Ghelfi"
   } as AnyDict
 
+  static DEFAULT_OPTIONS = {
+    id: "mou-soundpads",
+    classes: ["mou"],
+    window: {
+      title: "MOUSND.soundpads",
+      resizable: true,
+      minimizable: false,
+    },
+    position: {
+      top: 0,
+      left: 0,
+      width: 250,
+      height: 30000, // force 100%
+    },
+    dragDrop: [{ dragSelector: ".draggable" }]
+  };
+
+  static PARTS = {
+    content: { template: `modules/${MODULE_ID}/templates/soundpads.hbs` }
+  };
+
   private creator?: string
   private previewTimeout?: ReturnType<typeof setTimeout> // timeout object for preview (to stop sound on close)
   private previewSound: HTMLAudioElement
   private showAll: boolean
+  private dragDropHandlers: AnyDict[]
 
   // temporary storage
   private sounds?: AnyDict
@@ -33,24 +55,22 @@ export class MouSoundPads extends MouApplication {
     super()
     this.previewSound = new Audio()
     this.showAll = false
+    this.dragDropHandlers = this.createDragDropHandlers()
   }
-  
-  static override get defaultOptions() {
-    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
-      id: "mou-soundpads",
-      classes: ["mou"],
-      title: (game as Game).i18n!.localize("MOUSND.soundpads"),
-      template: `modules/${MODULE_ID}/templates/soundpads.hbs`,
-      top: 0,
-      left: 0,
-      width: 250,
-      height: 30000, // force 100%
-      dragDrop: [{dragSelector: ".draggable"}],
-      resizable: true,
-      minimizable: false,
-      closeOnSubmit: true,
-      submitOnClose: false
-    });
+
+  /**
+   * V2: ApplicationV2 no longer wires up drag/drop automatically from the
+   * `dragDrop` DEFAULT_OPTIONS entry - the DragDrop helper class has to be
+   * instantiated and bound to the rendered element (see _onRender) ourselves.
+   */
+  private createDragDropHandlers(): AnyDict[] {
+    const { DragDrop } = foundry.applications.ux as AnyDict
+    const configs = (((this as AnyDict).options?.dragDrop || [{ dragSelector: ".draggable" }])) as AnyDict[]
+    return configs.map((d: AnyDict) => {
+      d.permissions = { dragstart: () => true, drop: () => false }
+      d.callbacks = { dragstart: this._onDragStart.bind(this) }
+      return new DragDrop(d)
+    })
   }
 
   static cleanSoundName(filename: string) {
@@ -64,7 +84,7 @@ export class MouSoundPads extends MouApplication {
     return soundName
   }
   
-  override async getData() {
+  async _prepareContext(_options: AnyDict) {
     const savedCreator = MouApplication.getSettings(SETTINGS_SOUNDPAD_CREATOR) as string
     if(savedCreator && savedCreator in MouSoundPads.CREATORS) {
       this.creator = savedCreator
@@ -187,9 +207,12 @@ export class MouSoundPads extends MouApplication {
 
 
   /**
-   * Implements listeners
+   * V2: activateListeners(html) is replaced by _onRender(context, options).
+   * jQuery is kept intentionally (still fully supported) to minimize the diff
+   * against the rest of the (still jQuery-based) codebase.
    */
-  override activateListeners(html: JQuery<HTMLElement>) {
+  async _onRender(context: AnyDict, options: AnyDict) {
+    await super._onRender(context, options)
     if(MouApplication.getSettings(SETTINGS_SOUNDPAD_HIDE_CONTROLS)) {
       $("#controls").hide()
       $("#logo").hide()
@@ -198,6 +221,7 @@ export class MouSoundPads extends MouApplication {
     }
 
     // keep html for later usage
+    const html = $((this as AnyDict).element as HTMLElement)
     this.html = html
     const parent = this
 
@@ -289,6 +313,9 @@ export class MouSoundPads extends MouApplication {
     }
 
     this.toggleVisibility()
+
+    // (re)bind drag & drop handlers to the freshly rendered element
+    this.dragDropHandlers.forEach((d: AnyDict) => d.bind((this as AnyDict).element))
   }
 
   /**
@@ -419,8 +446,8 @@ export class MouSoundPads extends MouApplication {
     }
   }
 
-  override async close(): Promise<void> {
-    await super.close();
+  async close(options?: AnyDict): Promise<void> {
+    await super.close(options);
     if(MouApplication.getSettings(SETTINGS_SOUNDPAD_HIDE_CONTROLS)) {
       $("#controls").show();
       $("#logo").show();
@@ -452,7 +479,7 @@ export class MouSoundPads extends MouApplication {
   }
 
 
-  override _onDragStart(event : DragEvent) {
+  _onDragStart(event : DragEvent) {
     if(!event.currentTarget) return
     const soundIdx = $(event.currentTarget).data('idx')
 
@@ -483,7 +510,6 @@ export class MouSoundPads extends MouApplication {
   }
 
   private async _onPlaySound(event : Event) {
-    console.log("YESSSSSSSSS")
     event.preventDefault();
     if(!event.currentTarget) return
     const soundIdx = $(event.currentTarget).data('idx')
@@ -537,7 +563,6 @@ export class MouSoundPads extends MouApplication {
       const channel = MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL)
 
       // play sound (reset URL)
-      console.log("Playing sound ", sound.name, sound.playing, playlist)
       playlist!.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, path: sound.path, playing: !sound.playing, volume: volume, channel: channel}]);
 
       // show warning

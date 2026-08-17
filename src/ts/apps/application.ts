@@ -1,11 +1,17 @@
 import MouConfig, { MODULE_ID, MODULE_MOULINETTE_ID, SETTINGS_SOUNDBOARDS } from "../constants";
 import { AnyDict, MouModule } from "../types";
 
+// foundry.applications.api typings are still incomplete in fvtt-types (alpha stubs for v13+),
+// so we grab the mixin/base classes through an AnyDict cast rather than fighting the generics.
+const FoundryApplicationsApi = foundry.applications.api as AnyDict;
+const MouApplicationV2Base = FoundryApplicationsApi.HandlebarsApplicationMixin(FoundryApplicationsApi.ApplicationV2);
+
 /**
- * This class server allow Moulinette Application to be independant from FVTT
+ * This class serves to allow Moulinette Applications to be independent from FVTT,
+ * and is now based on ApplicationV2 + HandlebarsApplicationMixin.
  */
-export default class MouApplication extends Application {
- 
+export default class MouApplication extends MouApplicationV2Base {
+
   static APP_NAME = "MouApplication";
 
   APP_NAME = "Moulinette Audio";        // default application name
@@ -70,9 +76,13 @@ export default class MouApplication extends Application {
     return ((game as Game).settings as AnyDict).get(MODULE_ID, key)
   }
 
-  /** Forces FoundryVTT to automatically resize the window (when auto) */
+  /**
+   * Forces FoundryVTT to automatically resize the window (when height/width is "auto").
+   * ApplicationV2 keeps the same setPosition()/position API as v1 for this purpose.
+   */
   autoResize() {
-    this.setPosition({ left: this.position.left, top: this.position.top, height: this.position.height, width: this.position.width})
+    const pos = (this as AnyDict).position;
+    (this as AnyDict).setPosition({ left: pos.left, top: pos.top, height: pos.height, width: pos.width })
   }
 
   /**
