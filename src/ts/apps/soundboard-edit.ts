@@ -25,10 +25,10 @@ export class MouSoundboardEdit extends MouApplication {
   }
   
   static override get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
       id: "mou-soundboard-edit",
       classes: ["mou"],
-      title: (game as Game).i18n.localize("MOUSND.edit_slot"),
+      title: (game as Game).i18n!.localize("MOUSND.edit_slot"),
       template: `modules/${MODULE_ID}/templates/soundboard-edit.hbs`,
       width: 500,
       height: "auto",
@@ -67,10 +67,12 @@ export class MouSoundboardEdit extends MouApplication {
     }
     else if(button.classList.contains("browse")) {
       const icon = this.html?.find("input.icon2").val() as string
-      new FilePicker({callback: this._onPathChosen.bind(this), current: icon ? icon : "moulinette/images/", type: "image"}).render(true);
+      const FilePickerImpl: any = (foundry.applications.apps.FilePicker as AnyDict).implementation;
+      (new FilePickerImpl({callback: this._onPathChosen.bind(this), current: icon ? icon : "moulinette/images/", type: "image"}) as AnyDict).render(true);
     }
     else if(button.classList.contains("browseSound")) {
-      new FilePicker({callback: this._onAudioChosen.bind(this), type: "audio"}).render(true);
+      const FilePickerImpl: any = (foundry.applications.apps.FilePicker as AnyDict).implementation;
+      (new FilePickerImpl({callback: this._onAudioChosen.bind(this), type: "audio"}) as AnyDict).render(true);
     }
     else if(button.classList.contains("searchMoulinetteImage")) {
       const moulinette = MouApplication.getMoulinetteModule()
@@ -78,7 +80,7 @@ export class MouSoundboardEdit extends MouApplication {
         const browser = new (moulinette.utils.browser)({}, "Image", this._onPathChosen.bind(this))
         browser.render(true)
       } else {
-        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
+        return ui.notifications?.error((game as Game).i18n!.localize("MOUSND.error_moulinette_required"))
       }
     }
     else if(button.classList.contains("searchMoulinetteIcon")) {
@@ -87,7 +89,7 @@ export class MouSoundboardEdit extends MouApplication {
         const browser = new (moulinette.utils.browser)({}, "Icon", this._onIconChosen.bind(this))
         browser.render(true)
       } else {
-        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
+        return ui.notifications?.error((game as Game).i18n!.localize("MOUSND.error_moulinette_required"))
       }
     }
     else if(button.classList.contains("searchMoulinetteSound")) {
@@ -96,7 +98,7 @@ export class MouSoundboardEdit extends MouApplication {
         const browser = new (moulinette.utils.browser)({}, "Audio", this._onAudioChosen.bind(this))
         browser.render(true)
       } else {
-        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
+        return ui.notifications?.error((game as Game).i18n!.localize("MOUSND.error_moulinette_required"))
       }
     }
     else if(button.classList.contains("delete")) {
@@ -104,8 +106,8 @@ export class MouSoundboardEdit extends MouApplication {
       let soundboard = MouApplication.getUserSoundboard()
       const slot = `#${this.data.idx}`
       const dialogDecision = await Dialog.confirm({
-        title: (game as Game).i18n.localize("MOUSND.delete_slot"),
-        content: (game as Game).i18n.format("MOUSND.delete_slot_content", { from: slot }),
+        title: (game as Game).i18n!.localize("MOUSND.delete_slot"),
+        content: (game as Game).i18n!.format("MOUSND.delete_slot_content", { from: slot }),
       })
       if(!dialogDecision) return;
 
@@ -119,7 +121,7 @@ export class MouSoundboardEdit extends MouApplication {
     else if(button.classList.contains("save")) {
       const settings = MouApplication.getUserSoundboard()
       if(this.data.path.length == 0) {
-        return ui.notifications?.error((game as Game).i18n.localize("MOUSND.error_soundboard_noaudio"));
+        return ui.notifications?.error((game as Game).i18n!.localize("MOUSND.error_soundboard_noaudio"));
       }
 
       // check if fade is a number
@@ -127,7 +129,7 @@ export class MouSoundboardEdit extends MouApplication {
         delete this.data.fade
       }      
 
-      let audio = foundry.utils.duplicate(this.data)
+      let audio = (foundry.utils as AnyDict).duplicate(this.data)
       delete audio["id"]
       delete audio["idx"]
       settings["audio-" + this.slot] = audio

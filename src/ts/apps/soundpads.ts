@@ -36,10 +36,10 @@ export class MouSoundPads extends MouApplication {
   }
   
   static override get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
       id: "mou-soundpads",
       classes: ["mou"],
-      title: (game as Game).i18n.localize("MOUSND.soundpads"),
+      title: (game as Game).i18n!.localize("MOUSND.soundpads"),
       template: `modules/${MODULE_ID}/templates/soundpads.hbs`,
       top: 0,
       left: 0,
@@ -74,7 +74,7 @@ export class MouSoundPads extends MouApplication {
     
     const moulinette = MouApplication.getMoulinetteModule()
     if(!moulinette) {
-      throw new Error((game as Game).i18n.localize("MOUSND.error_moulinette_required"))
+      throw new Error((game as Game).i18n!.localize("MOUSND.error_moulinette_required"))
     }
     
     const index = await MouSoundpadUtils.getSoundpadSounds(MouSoundPads.CREATORS[this.creator])
@@ -457,14 +457,14 @@ export class MouSoundPads extends MouApplication {
     const soundIdx = $(event.currentTarget).data('idx')
 
     if(MouSoundpadUtils.noTTADownload()) {
-      return this.logWarn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+      return this.logWarn((game as Game).i18n!.localize("MOUSND.tta_warning_nodownload"))
     }
 
     // sounds
     if(soundIdx && soundIdx > 0 && soundIdx <= this.sounds!.length) {
       const soundData = this.sounds![soundIdx-1]
-      const pack = foundry.utils.duplicate(this.packs!.find((p : AnyDict) => p.pack_ref == soundData.pack.pack_ref))
-      const sound = foundry.utils.duplicate(soundData)
+      const pack = (foundry.utils as AnyDict).duplicate(this.packs!.find((p : AnyDict) => p.pack_ref == soundData.pack.pack_ref))
+      const sound = (foundry.utils as AnyDict).duplicate(soundData)
       sound.sas = "?" + pack.sas
 
       const dragData = {
@@ -483,6 +483,7 @@ export class MouSoundPads extends MouApplication {
   }
 
   private async _onPlaySound(event : Event) {
+    console.log("YESSSSSSSSS")
     event.preventDefault();
     if(!event.currentTarget) return
     const soundIdx = $(event.currentTarget).data('idx')
@@ -500,7 +501,7 @@ export class MouSoundPads extends MouApplication {
       const moulinette = MouApplication.getMoulinetteModule()
       const folder = moulinette ? await moulinette.utils?.foundry.getOrCreateFolder("Playlist", "Moulinette") : null
       const playlistName = MouSoundPads.MOULINETTE_PLAYLIST.replace("#CREATOR#", MouSoundPads.CREATORS[this.creator!])
-      let playlist = (game as Game).playlists!.find( pl => pl.name == playlistName )
+      let playlist = (game as Game).playlists!.find( (pl: AnyDict) => pl.name == playlistName )
       if(!playlist) {
         playlist = await Playlist.create({name: playlistName, mode: -1, folder: folder })
       }
@@ -536,14 +537,15 @@ export class MouSoundPads extends MouApplication {
       const channel = MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL)
 
       // play sound (reset URL)
+      console.log("Playing sound ", sound.name, sound.playing, playlist)
       playlist!.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, path: sound.path, playing: !sound.playing, volume: volume, channel: channel}]);
 
       // show warning
       if(userMayNotDownload) {
         if(!MouApplication.getSettings(SETTINGS_SOUNDPAD_NO_TTA_WARNING)) {
-          ui.notifications?.warn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+          ui.notifications?.warn((game as Game).i18n!.localize("MOUSND.tta_warning_nodownload"))
         }
-        this.logWarn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+        this.logWarn((game as Game).i18n!.localize("MOUSND.tta_warning_nodownload"))
       }
     }
   }
@@ -663,9 +665,9 @@ export class MouSoundPads extends MouApplication {
     if(!canvas) return false;
     if(MouSoundpadUtils.noTTADownload()) {
       if(!MouApplication.getSettings(SETTINGS_SOUNDPAD_NO_TTA_WARNING)) {
-        ui.notifications?.warn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+        ui.notifications?.warn((game as Game).i18n!.localize("MOUSND.tta_warning_nodownload"))
       }
-      this.logWarn((game as Game).i18n.localize("MOUSND.tta_warning_nodownload"))
+      this.logWarn((game as Game).i18n!.localize("MOUSND.tta_warning_nodownload"))
       return false;
     }
     else {

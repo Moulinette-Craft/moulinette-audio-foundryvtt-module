@@ -54,20 +54,20 @@ export default class MouApplication extends Application {
   logError(message: string, data?: any, error?: Error) { MouApplication.logError(this.APP_NAME, message, data, error) }
 
   static getModule(): MouModule {
-    return (game as Game).modules.get(MODULE_ID) as MouModule;
+    return ((game as Game).modules as unknown as Map<string, unknown>).get(MODULE_ID) as MouModule;
   }
 
   static getMoulinetteModule(): any {
-    return (game as Game).modules.get(MODULE_MOULINETTE_ID) as MouModule;
+    return ((game as Game).modules as unknown as Map<string, unknown>).get(MODULE_MOULINETTE_ID) as MouModule;
   }
 
   static async setSettings(key: string, value: unknown) : Promise<unknown> {
     MouApplication.logDebug(MouApplication.APP_NAME, `Storing data for settings ${key}`)
-    return (game as Game).settings.set(MODULE_ID, key, value)  
+    return ((game as Game).settings as AnyDict).set(MODULE_ID, key, value)  
   }
 
   static getSettings(key: string): unknown {
-    return (game as Game).settings.get(MODULE_ID, key)
+    return ((game as Game).settings as AnyDict).get(MODULE_ID, key)
   }
 
   /** Forces FoundryVTT to automatically resize the window (when auto) */

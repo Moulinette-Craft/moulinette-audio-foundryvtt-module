@@ -16,10 +16,10 @@ export class MouSoundboard extends Application {
   private showList: boolean = false
 
   static override get defaultOptions() {
-    return foundry.utils.mergeObject(super.defaultOptions, {
+    return (foundry.utils as AnyDict).mergeObject(super.defaultOptions, {
       id: "mou-soundboard",
       classes: ["mou"],
-      title: (game as Game).i18n.localize("MOUSND.soundboard"),
+      title: (game as Game).i18n!.localize("MOUSND.soundboard"),
       template: `modules/${MODULE_ID}/templates/soundboard.hbs`,
       width: 100,
       height: "auto",
@@ -61,7 +61,7 @@ export class MouSoundboard extends Application {
       for(let c=0; c<this.cols; c++) {
         const i = 1 + (r*this.cols) + c
         if(Object.keys(soundboard).includes(`audio-${r}#${c}`)) {
-          const audio = foundry.utils.duplicate(soundboard[`audio-${r}#${c}`])
+          const audio = (foundry.utils as AnyDict).duplicate(soundboard[`audio-${r}#${c}`])
           audio.id = `${r}#${c}`
           audio.idx = i
           row.push(audio)
@@ -139,13 +139,13 @@ export class MouSoundboard extends Application {
     html.find(".export").on("click", () => {
       const filename = `moulinette-${((game as Game).world as AnyDict).title.slugify()}-soundboard.json`
       const data = MouApplication.getUserSoundboard()
-      saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
+      foundry.utils.saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
     })
 
     html.find(".exportAll").on("click", () => {
       const filename = `moulinette-${((game as Game).world as AnyDict).title.slugify()}-all-soundboard.json`
       const data = MouApplication.getSettings(SETTINGS_SOUNDBOARDS) as AnyDict
-      saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
+      foundry.utils.saveDataToFile(JSON.stringify(data, null, 2), "text/json", filename);
     })
 
     const v12 = (game as Game).version.startsWith("12.")
@@ -153,9 +153,9 @@ export class MouSoundboard extends Application {
     html.find(".import").on("click", async function() {
       new Dialog({
         title: `Import Data: Moulinette Soundboard`,
-        content: await renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
-          hint1: (game as Game).i18n.format("DOCUMENT.ImportDataHint1", {document: "soundboard"}),
-          hint2: (game as Game).i18n.format("DOCUMENT.ImportDataHint2", {name: "this soundboard"})
+        content: await foundry.applications.handlebars.renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
+          hint1: (game as Game).i18n!.format("DOCUMENT.ImportDataHint1", {document: "soundboard"}),
+          hint2: (game as Game).i18n!.format("DOCUMENT.ImportDataHint2", {name: "this soundboard"})
         }),
         buttons: {
           import: {
@@ -164,7 +164,7 @@ export class MouSoundboard extends Application {
             callback: html => {
               const form = (html as JQuery<HTMLElement>).find("form")[0];
               if ( !form.data.files.length ) return ui.notifications?.error("You did not upload a data file!");
-              readTextFromFile(form.data.files[0]).then(json => {
+              foundry.utils.readTextFromFile(form.data.files[0]).then(json => {
                 const data = JSON.parse(json)
                 // check if from v1
                 const keys = Object.keys(data)
@@ -195,7 +195,7 @@ export class MouSoundboard extends Application {
           },
           no: {
             icon: '<i class="fa-solid fa-times"></i>',
-            label: (game as Game).i18n.localize("MOUSND.cancel")
+            label: (game as Game).i18n!.localize("MOUSND.cancel")
           }
         },
         default: "import"
@@ -207,9 +207,9 @@ export class MouSoundboard extends Application {
     html.find(".importAll").on("click", async function() {
       new Dialog({
         title: `Import Data: Moulinette Soundboard Collection`,
-        content: await renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
-          hint1: (game as Game).i18n.format("DOCUMENT.ImportDataHint1", {document: "soundboard collection"}),
-          hint2: (game as Game).i18n.format("DOCUMENT.ImportDataHint2", {name: "this soundboard collection"})
+        content: await foundry.applications.handlebars.renderTemplate(`templates/apps/import-data.${v12 ? "html" : "hbs"}`, {
+          hint1: (game as Game).i18n!.format("DOCUMENT.ImportDataHint1", {document: "soundboard collection"}),
+          hint2: (game as Game).i18n!.format("DOCUMENT.ImportDataHint2", {name: "this soundboard collection"})
         }),
         buttons: {
           import: {
@@ -218,7 +218,7 @@ export class MouSoundboard extends Application {
             callback: html => {
               const form = (html as JQuery<HTMLElement>).find("form")[0];
               if ( !form.data.files.length ) return ui.notifications?.error("You did not upload a data file!");
-              readTextFromFile(form.data.files[0]).then(json => {
+              foundry.utils.readTextFromFile(form.data.files[0]).then(json => {
                 const data = JSON.parse(json)
                 MouApplication.setSettings(SETTINGS_SOUNDBOARDS, data).then(() => parent.render(true))
               });
@@ -226,7 +226,7 @@ export class MouSoundboard extends Application {
           },
           no: {
             icon: '<i class="fa-solid fa-times"></i>',
-            label: (game as Game).i18n.localize("MOUSND.cancel")
+            label: (game as Game).i18n!.localize("MOUSND.cancel")
           }
         },
         default: "import"
@@ -240,8 +240,8 @@ export class MouSoundboard extends Application {
       const userSoundboard = MouApplication.getUserSoundboard(boardIdx)
 
       return Dialog.confirm({
-        title: `${(game as Game).i18n.localize("MOUSND.delete_tooltip")}`,
-        content: `${(game as Game).i18n.format("MOUSND.delete_warning", { name: userSoundboard.name})}`,
+        title: `${(game as Game).i18n!.localize("MOUSND.delete_tooltip")}`,
+        content: `${(game as Game).i18n!.format("MOUSND.delete_warning", { name: userSoundboard.name})}`,
         yes: () => {
           MouApplication.deleteSoundboard(boardIdx).then(() => {
             parent.render(true)
@@ -252,14 +252,14 @@ export class MouSoundboard extends Application {
 
     html.find(".addBoard").on("click", async () => {
       new Dialog({
-        title: (game as Game).i18n.localize("MOUSND.add_board_tooltip"),
-        content: await renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
+        title: (game as Game).i18n!.localize("MOUSND.add_board_tooltip"),
+        content: await foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
           name: ""
         }),
         buttons: {
           create: {
             icon: '<i class="fa-solid fa-plus-square"></i>',
-            label: `${(game as Game).i18n.localize("MOUSND.create")}`,
+            label: `${(game as Game).i18n!.localize("MOUSND.create")}`,
             callback: html => {
               const name = (html as JQuery<HTMLElement>).find("input").val() as string
               if(name.length < 3) {
@@ -272,7 +272,7 @@ export class MouSoundboard extends Application {
           },
           cancel: {
             icon: '<i class="fa-solid fa-times"></i>',
-            label: (game as Game).i18n.localize("MOUSND.cancel")
+            label: (game as Game).i18n!.localize("MOUSND.cancel")
           }
         },
         default: "create"
@@ -286,14 +286,14 @@ export class MouSoundboard extends Application {
       const userSoundboard = MouApplication.getUserSoundboard(boardIdx)
               
       new Dialog({
-        title: (game as Game).i18n.localize("MOUSND.edit_tooltip"),
-        content: await renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
+        title: (game as Game).i18n!.localize("MOUSND.edit_tooltip"),
+        content: await foundry.applications.handlebars.renderTemplate(`modules/${MODULE_ID}/templates/soundboard-name.hbs`, {
           name: userSoundboard.name
         }),
         buttons: {
           ok: {
             icon: '<i class="fa-solid fa-pen-to-square"></i>',
-            label: `${(game as Game).i18n.localize("MOUSND.rename")}`,
+            label: `${(game as Game).i18n!.localize("MOUSND.rename")}`,
             callback: html => {
               const name = (html as JQuery<HTMLElement>).find("input").val() as string
               if(name.length < 3) {
@@ -305,7 +305,7 @@ export class MouSoundboard extends Application {
           },
           cancel: {
             icon: '<i class="fa-solid fa-times"></i>',
-            label: (game as Game).i18n.localize("MOUSND.cancel")
+            label: (game as Game).i18n!.localize("MOUSND.cancel")
           }
         },
         default: "ok"
@@ -365,8 +365,8 @@ export class MouSoundboard extends Application {
           // target defined => prompt for desired behaviour
           else {
             overwrite = await Dialog.confirm({
-              title: (game as Game).i18n.localize("MOUSND.move_audio"),
-              content: (game as Game).i18n.localize("MOUSND.move_audio_content"),
+              title: (game as Game).i18n!.localize("MOUSND.move_audio"),
+              content: (game as Game).i18n!.localize("MOUSND.move_audio_content"),
             })
             if(overwrite == null) return;
           }
@@ -388,11 +388,11 @@ export class MouSoundboard extends Application {
       else {
         const soundboard = MouApplication.getUserSoundboard()
         if(`audio-${toSlot}` in soundboard) {
-          return ui.notifications?.error((game as Game).i18n.localize("MOUSND.slot_exists")); 
+          return ui.notifications?.error((game as Game).i18n!.localize("MOUSND.slot_exists")); 
         }
         console.log(data)
         if("moulinette" in data) {
-          ui.notifications?.warn((game as Game).i18n.localize("MOUSND.warn_import_before_drop"));
+          ui.notifications?.warn((game as Game).i18n!.localize("MOUSND.warn_import_before_drop"));
         } else if(data.type == "PlaylistSound") {
           const sound = await fromUuid(data.uuid) as AnyDict
           if(sound) {
@@ -449,7 +449,7 @@ export class MouSoundboard extends Application {
       }
       data.idx = row * this.cols + col + 1
       const moulinette = new MouSoundboardEdit(data, slot, this)
-      moulinette.options.title = (game as Game).i18n.localize("MOUSND.edit_slot")
+      moulinette.options.title = (game as Game).i18n!.localize("MOUSND.edit_slot")
       moulinette.render(true)
     }
     // middle click
@@ -458,8 +458,8 @@ export class MouSoundboard extends Application {
       let soundboard = MouApplication.getUserSoundboard()
       if(Object.keys(soundboard).includes("audio-" + slot)) {
         const dialogDecision = await Dialog.confirm({
-          title: (game as Game).i18n.localize("MOUSND.delete_slot"),
-          content: (game as Game).i18n.format("MOUSND.delete_slot_content", { from: slot }),
+          title: (game as Game).i18n!.localize("MOUSND.delete_slot"),
+          content: (game as Game).i18n!.format("MOUSND.delete_slot_content", { from: slot }),
         })
         if(!dialogDecision) return;
         delete soundboard["audio-" + slot]
@@ -473,11 +473,11 @@ export class MouSoundboard extends Application {
     if(slot) {
       let settings = MouApplication.getUserSoundboard()
       if(Object.keys(settings).includes("audio-" + slot)) {
-        const playlistName = `${(game as Game).i18n.localize("MOUSND.soundboard_name")}: ${(game as Game).user?.name || "??"}`
+        const playlistName = `${(game as Game).i18n!.localize("MOUSND.soundboard_name")}: ${(game as Game).user?.name || "??"}`
         const soundUri = settings["audio-" + slot]
         MouSoundboardUtils.playSound(soundUri, playlistName)
       } else {
-        ui.notifications?.warn((game as Game).i18n.localize("MOUSND.slot_notassigned"));
+        ui.notifications?.warn((game as Game).i18n!.localize("MOUSND.slot_notassigned"));
       }
     }
   }

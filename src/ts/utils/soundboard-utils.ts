@@ -34,7 +34,7 @@ export class MouSoundboardUtils {
       path = path[0]
     }
     // get sound
-    let sound = playlist.sounds.find( s => s.path == path )
+    let sound = playlist.sounds.find( (s: AnyDict) => s.path == path )
     if(Array.isArray(sound)) sound = sound[0] // just in case multiple sounds have the same path
     if(!sound) {
       // 1. get filename from path, 2. trim extension
@@ -71,7 +71,7 @@ export class MouSoundboardUtils {
   static async updatePlayingSound(playlist : Playlist, updateData: any) {
     if (updateData.sounds) {
       for(const s of updateData.sounds) {
-        const sound = playlist.sounds.find(snd => snd.id == s._id) as PlaylistSound
+        const sound = playlist.sounds.find((snd: AnyDict) => snd.id == s._id) as PlaylistSound
         if(sound) {
           MouApplication.getModule().soundboard.updatePlaySound(sound.path as string, s.playing)
         }
