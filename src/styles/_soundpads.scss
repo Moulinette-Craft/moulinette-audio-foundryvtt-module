@@ -115,6 +115,13 @@
 
   .mtteHide {
     color: red;
+
+    // folders show their label inside an <h2>, which core Foundry styles with
+    // an explicit color - that beats the inherited red from .mtteHide, so it
+    // needs to be repeated here explicitly.
+    h2 {
+      color: red;
+    }
   }
 
   .toggleVisibility {
