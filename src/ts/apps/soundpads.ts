@@ -562,8 +562,15 @@ export class MouSoundPads extends MouApplication {
       const volume = MouApplication.getSettings(SETTINGS_SOUNDPAD_VOLUME)
       const channel = MouApplication.getSettings(SETTINGS_SOUNDPAD_CHANNEL)
 
-      // play sound (reset URL)
-      playlist!.updateEmbeddedDocuments("PlaylistSound", [{_id: sound.id, path: sound.path, playing: !sound.playing, volume: volume, channel: channel}]);
+      // play/stop sound using the Playlist API (like soundboard-utils.ts) rather than patching
+      // the "playing" field directly : for a freshly created sound, updateEmbeddedDocuments
+      // doesn't reliably start the underlying Sound object, so the file downloads but never plays.
+      if(sound.playing) {
+        playlist!.stopSound(sound)
+      } else {
+        await sound.update({path: sound.path, volume: volume, channel: channel})
+        playlist!.playSound(sound)
+      }
 
       // show warning
       if(userMayNotDownload) {
