@@ -1,11 +1,33 @@
 #mou-soundpads {
 
-  .expand {
-    cursor: pointer;
+  // ApplicationV2 wraps each PARTS entry in its own container (data-application-part).
+  // A cascading height:100% breaks the moment any ancestor in that chain doesn't have
+  // an explicit height, so we fill the window using flexbox all the way down instead.
+  .window-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 0;
+    background: none;
+
+    // the auto-generated PARTS wrapper (and our <form> root inside it)
+    > * {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+    }
   }
 
-  .window-content {
-    background: none;
+  form {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expand {
+    cursor: pointer;
   }
 
   .tabs {
@@ -29,9 +51,16 @@
     background: white;
   }
 
+  // .sidebar's own children (nav, footer, .info, .sounds, ...) are all
+  // position:absolute, so it has no in-flow content to size itself from.
+  // It needs to be part of the same flex chain as its ancestors (see the
+  // .window-content comment above) instead of relying on height:100%,
+  // otherwise it collapses and everything anchored to it via top/bottom
+  // gets squeezed.
   .sidebar {
     position: relative;
-    height: 100%;
+    flex: 1;
+    min-height: 0;
   }
 
   nav, footer, .info, .sounds {
