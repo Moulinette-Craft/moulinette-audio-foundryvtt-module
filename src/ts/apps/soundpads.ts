@@ -341,7 +341,7 @@ export class MouSoundPads extends MouApplication {
         this.html?.find(".sound:not(.alt)").each(function(idx, s) {
           idx; // unused
           const sndIdx = $(s).data('idx')
-          if(filtered.includes(sounds[sndIdx-1].filename)) {
+          if(filtered.includes(sounds[sndIdx-1].filepath)) {
             $(s).addClass("mtteHide")
             parent.html?.find(`.sound.alt[data-parent='${sndIdx}']`).addClass("mtteHide")
             if(!showAll) {
@@ -416,8 +416,8 @@ export class MouSoundPads extends MouApplication {
       else {
         const idx = $(source).data('idx')
         if(idx && idx > 0 && idx <= this.sounds!.length) {
-          key = this.sounds![idx-1].filename
-          pack = this.packs!.find((p : AnyDict) => p.idx == this.sounds![idx-1].pack)
+          key = this.sounds![idx-1].filepath
+          pack = this.packs!.find((p : AnyDict) => p.pack_ref == this.sounds![idx-1].pack.pack_ref)
           $(source).toggleClass("mtteHide")
           this.html!.find(`.sound.alt[data-parent='${idx}']`).toggleClass("mtteHide")
           if(!this.showAll) {
@@ -601,7 +601,7 @@ export class MouSoundPads extends MouApplication {
     // get list of all matching sounds
     const matches = this.sounds!.filter((s : AnyDict) => {
       // by default, hide all "hidden" entries
-      if(!this.showAll && filtered.includes(this.sounds![s.idx-1].filename)) {
+      if(!this.showAll && filtered.includes(this.sounds![s.idx-1].filepath)) {
         return false;
       }
       // filter by category
