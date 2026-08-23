@@ -15,16 +15,19 @@ export const FOUNDRYVTT_PLAYLIST_ENTRY = "PlaylistSound"
 
 export const MOU_STORAGE = "https://mttestorage.blob.core.windows.net/"
 
+// cols/rows: how many grid cells the slot spans horizontally/vertically (matches
+// the .sizeXY width/height overrides in _soundboard.scss - X is the column span,
+// Y the row span).
 export const SLOT_SIZES = [
-  { class: 1, merged: 1}, 
-  { class: 2, merged: 2}, 
-  { class: 3, merged: 3}, 
-  { class: 12, merged: 1},
-  { class: 13, merged: 1}, 
-  { class: 22, merged: 2}, 
-  { class: 32, merged: 3}, 
-  { class: 23, merged: 2}, 
-  { class: 33, merged: 3}]
+  { class: 1,  cols: 1, rows: 1 },
+  { class: 2,  cols: 2, rows: 1 },
+  { class: 3,  cols: 3, rows: 1 },
+  { class: 12, cols: 1, rows: 2 },
+  { class: 13, cols: 1, rows: 3 },
+  { class: 22, cols: 2, rows: 2 },
+  { class: 32, cols: 3, rows: 2 },
+  { class: 23, cols: 2, rows: 3 },
+  { class: 33, cols: 3, rows: 3 }]
 
 /**
  * The constants below can be overridden using the following macro :

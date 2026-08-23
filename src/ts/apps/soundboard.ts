@@ -70,10 +70,18 @@ export class MouSoundboard extends MouApplication {
 
     const allSounds = []
     const sounds = []
+    // cells covered by an earlier row's multi-row slot (e.g. a 2x2 placed on row r
+    // also covers row r+1) - the board is rendered as a CSS grid (see _soundboard.scss),
+    // so those covered cells must be skipped entirely (no DOM node at all) instead of
+    // rendering their own independent slot on top of/next to the larger one.
+    const reserved = new Set<string>()
     for(let r=0; r<this.rows; r++) {
       const row = []
       for(let c=0; c<this.cols; c++) {
         const i = 1 + (r*this.cols) + c
+        if(reserved.has(`${r}#${c}`)) {
+          continue
+        }
         if(Object.keys(soundboard).includes(`audio-${r}#${c}`)) {
           const audio = (foundry.utils as AnyDict).duplicate(soundboard[`audio-${r}#${c}`])
           audio.id = `${r}#${c}`
@@ -89,11 +97,15 @@ export class MouSoundboard extends MouApplication {
               this.playing[cleanPath] = false
             }
           }
-          // button size is larger
-          if(audio.size && audio.size > 1) {
-            const slotSize = SLOT_SIZES.find((s) => s.class == audio.size)
-            if(slotSize) {
-              c += slotSize.merged-1
+          // button spans more than 1 cell: reserve the cells it covers (including
+          // the ones below it) so nothing else gets rendered into them
+          const slotSize = SLOT_SIZES.find((s) => s.class == (audio.size || 1))
+          if(slotSize && (slotSize.cols > 1 || slotSize.rows > 1)) {
+            for(let dr=0; dr<slotSize.rows; dr++) {
+              for(let dc=0; dc<slotSize.cols; dc++) {
+                if(dr == 0 && dc == 0) continue
+                reserved.add(`${r+dr}#${c+dc}`)
+              }
             }
           }
         } else {
@@ -128,6 +140,10 @@ export class MouSoundboard extends MouApplication {
     const boardWidth = MouSoundboard.CELL_SIZE * this.cols
     ;(this as AnyDict).setPosition({"width": boardWidth + 16 + (this.showList ? 150 : 0)})
     html.find(".sounds").css("max-width", `${boardWidth}px`)
+    // .sounds is a CSS grid (see _soundboard.scss) so multi-row slots (1x2, 2x2, ...)
+    // can visually span into the row(s) below them - the column count is dynamic
+    // (user-configurable), so it has to be set here rather than in the stylesheet.
+    html.find(".sounds").css("grid-template-columns", `repeat(${this.cols}, ${MouSoundboard.CELL_SIZE}px)`)
 
     // retrieve settings
     const currentUserSoundboard = MouApplication.getUserSoundboard()

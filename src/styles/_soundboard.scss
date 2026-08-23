@@ -90,7 +90,7 @@
       width: 100%;
       height: 100%;
       border: 0px;
-      object-fit: cover;
+      object-fit: contain;
     }
 
     &.used.size1 p {
@@ -99,24 +99,28 @@
     }
 
     &.size2, &.size22, &.size23 {
+      grid-column: span 2;
       min-width: 84px !important;
       max-width: 84px !important;
       width: 84px !important;
     }
-  
+
     &.size3, &.size32, &.size33 {
+      grid-column: span 3;
       min-width: 132px !important;
       max-width: 132px !important;
       width: 132px !important;
     }
 
     &.size12, &.size22, &.size32 {
+      grid-row: span 2;
       min-height: 84px !important;
       max-height: 84px !important;
       height: 84px !important;
     }
 
     &.size13, &.size23, &.size33 {
+      grid-row: span 3;
       min-height: 132px !important;
       max-height: 132px !important;
       height: 132px !important;
@@ -267,4 +271,22 @@
 // to the 8px the width math assumes.
 #mou-soundboard .window-content {
   padding: 8px;
+}
+
+// Multi-row slots (1x2, 2x2, 3x2, ...) need a real CSS grid to visually span into the
+// row(s) below them - a flex row per .boardrow can only ever grow its own row taller,
+// it can't bleed into the next one. .sounds becomes the grid (column count is dynamic,
+// set from soundboard.ts) and each .boardrow keeps the markup used to build it but is
+// display:contents so its .snd children are placed directly onto that grid instead of
+// laid out as their own independent flex line. This only applies to the main board -
+// #mou-soundboard-edit's preview row keeps its original flex layout.
+#mou-soundboard {
+  .sounds {
+    display: grid;
+    grid-auto-rows: #{36 + 2 + 10}px; // matches MouSoundboard.CELL_SIZE
+  }
+
+  .boardrow {
+    display: contents;
+  }
 }
