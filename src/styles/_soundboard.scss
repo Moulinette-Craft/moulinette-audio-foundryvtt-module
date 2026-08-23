@@ -1,6 +1,10 @@
 #mou-soundboard, #mou-soundboard-edit {
   min-width: 60px !important;
 
+  .standard-form {
+    gap: 0px;
+  }
+
   .success {
     color: green;
   }
@@ -152,6 +156,10 @@
     padding: 3px;
   }
 
+  .snd {
+    border : 1px solid transparent;
+  }
+
   .snd.used {
     &:hover {
       border: 1px solid red;
@@ -249,4 +257,14 @@
   .sound-fade {
     text-align: end;
   }
+}
+
+// soundboard.ts computes the window width pixel-exact (CELL_SIZE * cols + 16, where
+// 16 assumes 8px of .window-content padding on each side - the old core default) and
+// pins .sounds' max-width to that same value. Core AppV2 windows now use --paddingX:
+// 1.5rem (24px/side) by default, so without this override the grid no longer fits the
+// window and overflows past the board_list divider on the right. Pin the padding back
+// to the 8px the width math assumes.
+#mou-soundboard .window-content {
+  padding: 8px;
 }
