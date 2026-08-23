@@ -14,7 +14,7 @@
   "scripts": [],
   "socket": true,
   "compatibility": {
-    "minimum": "12",
+    "minimum": "13",
     "verified": "14",
     "maximum": "14"
   },
