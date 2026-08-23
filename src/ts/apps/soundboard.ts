@@ -42,8 +42,14 @@ export class MouSoundboard extends MouApplication {
       throw new Error("You're not authorized to use the Moulinette Soundboard.");
     }
 
-    // build playing sounds
-    this.playing = {}
+    // sync playing sounds from the actual global audio state, merging rather than
+    // overwriting this.playing: updatePlaySound() (triggered by the preUpdatePlaylist
+    // hook) already sets a slot's flag as soon as its PlaylistSound document updates,
+    // ahead of the actual browser Audio element registering into game.audio.playing.
+    // Resetting the map here on that re-render used to erase that just-set flag before
+    // it ever got a chance to render - most visibly on a slot's very first click, which
+    // needs to create its PlaylistSound document first and so starts audio later,
+    // losing the race against the fixed 200ms re-render delay below.
     for(const sound of Array.from((game as Game).audio.playing.values())) {
       const cleanPath = MouMediaUtils.getCleanURI(sound.src)
       this.playing[cleanPath] = true
