@@ -1,5 +1,13 @@
 #mou-soundpads {
 
+  // Core Foundry caps every ApplicationV2 window at
+  // `calc(100vh - 1.5 * var(--hotbar-height))` (see `.application` in foundry2.css).
+  // For this full-height docked panel that leaves an empty strip (~15% of the
+  // viewport) at the bottom, because `_updatePosition()` clamps our requested
+  // `height: 30000` down to that max-height. Override it so the window really
+  // fills the screen.
+  max-height: 100vh;
+
   // ApplicationV2 wraps each PARTS entry in its own container (data-application-part).
   // A cascading height:100% breaks the moment any ancestor in that chain doesn't have
   // an explicit height, so we fill the window using flexbox all the way down instead.
