@@ -280,13 +280,13 @@
 
 "@pixi/assets@7.4.3", "@pixi/assets@github:foundry-vtt-types/pixi-assets#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-assets.git#1a8b22552ddc747fcaae7ad65a2514a4a9869f8c"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-assets.git#1a8b22552ddc747fcaae7ad65a2514a4a9869f8c"
   dependencies:
     "@types/css-font-loading-module" "^0.0.12"
 
 "@pixi/basis@github:foundry-vtt-types/pixi-basis#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-basis.git#d0956799d7c23f59e12b7b2ec4dc21c041180b0e"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-basis.git#d0956799d7c23f59e12b7b2ec4dc21c041180b0e"
 
 "@pixi/color@7.4.3":
   version "7.4.3"
@@ -302,7 +302,7 @@
 
 "@pixi/compressed-textures@7.4.3", "@pixi/compressed-textures@github:foundry-vtt-types/pixi-compressed-textures#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-compressed-textures.git#890bd5cf9f92d6e48103b733513ccb603e5d1a36"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-compressed-textures.git#890bd5cf9f92d6e48103b733513ccb603e5d1a36"
 
 "@pixi/constants@>=6.0.4 <8.0.0", "@pixi/constants@7.4.3":
   version "7.4.3"
@@ -311,7 +311,7 @@
 
 "@pixi/core@^7.2.0", "@pixi/core@7.4.3", "@pixi/core@github:foundry-vtt-types/pixi-core#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-core.git#b2554df0b43183980830a08d92a960ede78ad25e"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-core.git#b2554df0b43183980830a08d92a960ede78ad25e"
   dependencies:
     "@pixi/color" "7.4.3"
     "@pixi/constants" "7.4.3"
@@ -419,7 +419,7 @@
 
 "@pixi/particle-emitter@github:foundry-vtt-types/pixi-particle-emitter#main":
   version "5.0.8"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-particle-emitter.git#9bd3cb53826b2c7d4c407db183f4dd93edd50aae"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-particle-emitter.git#9bd3cb53826b2c7d4c407db183f4dd93edd50aae"
 
 "@pixi/prepare@7.4.3":
   version "7.4.3"
@@ -477,7 +477,7 @@
 
 "@pixi/ticker@>=6.0.4 <8.0.0", "@pixi/ticker@github:foundry-vtt-types/pixi-ticker#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-ticker.git#6a2756560f67a81fafbb1914b56d8974b6f34085"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-ticker.git#6a2756560f67a81fafbb1914b56d8974b6f34085"
   dependencies:
     "@pixi/extensions" "7.4.3"
     "@pixi/settings" "7.4.3"
@@ -485,7 +485,7 @@
 
 "@pixi/utils@github:foundry-vtt-types/pixi-utils#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi-utils.git#8274a744f353ec7a7d9313748ceab22455df8837"
+  resolved "git+https://github.com/foundry-vtt-types/pixi-utils.git#8274a744f353ec7a7d9313748ceab22455df8837"
   dependencies:
     "@pixi/color" "7.4.3"
     "@pixi/constants" "7.4.3"
@@ -1262,7 +1262,7 @@ pixi-basis-ktx2@^0.0.22:
 
 pixi.js@^7.x.x, "pixi.js@github:foundry-vtt-types/pixi.js#main":
   version "7.4.3"
-  resolved "git+ssh://git@github.com/foundry-vtt-types/pixi.js.git#a8414afd3a1141c3ef94e62079e7861723029c2c"
+  resolved "git+https://github.com/foundry-vtt-types/pixi.js.git#a8414afd3a1141c3ef94e62079e7861723029c2c"
   dependencies:
     "@pixi/accessibility" "7.4.3"
     "@pixi/app" "7.4.3"
