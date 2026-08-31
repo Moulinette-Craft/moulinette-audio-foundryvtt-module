@@ -40,9 +40,22 @@
 
   .tabs {
     color: white;
+    // Foundry core styles this <nav class="sheet-tabs tabs"> with a `border-top`
+    // (`nav.tabs`), `margin: 4px 0` (`body.game .app .tabs.sheet-tabs`) and
+    // `line-height: 2.5` - all of which grow/offset the band the logo is painted
+    // in and clip the top of the artwork. Pin every box-model property here so
+    // the painted band is exactly `height` tall, top-aligned in the sidebar.
+    box-sizing: border-box;
+    height: 56px;
+    margin: 0;
+    padding: 0;
+    border: none;
     border-bottom: 1px solid white;
-    padding-bottom: 3px;
-    background-size: 220px;
+    line-height: 0;
+    // Fixed-px logo height (< the 56px box) so it can never overflow/clip,
+    // whatever core does to the box. The old `220px` was width-based, so the
+    // resulting height was unbounded.
+    background-size: auto 44px;
     background-repeat: no-repeat;
     background-position: center;
 
@@ -76,7 +89,8 @@
   }
 
   nav {
-    height: 55px;
+    top: 0;
+    height: 56px;
     width: 100%;
   }
 
