@@ -17,6 +17,14 @@ jobs:
         with:
           node-version: 22
 
+      # fvtt-types pulls some transitive dependencies from GitHub over SSH
+      # (ssh://git@github.com/...), which fails on CI where no SSH key is set up.
+      # Rewrite those URLs to anonymous HTTPS, which is enough for public repos.
+      - name: Prefer HTTPS for GitHub git dependencies
+        run: |
+          git config --global url."https://github.com/".insteadOf "ssh://git@github.com/"
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+
       - name: Install dependencies
         run: yarn
 
